@@ -7,12 +7,28 @@ const SelectedReposDropdown = () => {
     useEffect(() => {
         if (window && typeof window !== "undefined") {
             const FAVORITED_REPOS = localStorage.getItem("FAVORITED_REPOS");
-            if (FAVORITED_REPOS) {
-                setFavoritedRepos(JSON.parse(FAVORITED_REPOS));
+            if (!FAVORITED_REPOS) {
+                // set an inital empty storage if there is none
+                localStorage.setItem("FAVORITED_REPOS", JSON.stringify([]));
             }
+            const storeFavoritedRepos = () => {
+                const FAVORITED_REPOS = localStorage.getItem("FAVORITED_REPOS");
+                if (FAVORITED_REPOS) {
+                    setFavoritedRepos(JSON.parse(FAVORITED_REPOS));
+                }
+            };
+
+            const handleStorageChanges = () => {
+                console.log("storage changed");
+                storeFavoritedRepos();
+            };
+
+            storeFavoritedRepos();
+            window.addEventListener("storage", handleStorageChanges);
+
+            return () => window.removeEventListener("storage", handleStorageChanges);
         }
     }, []);
-
     return (
         <div className="dropdown dropdown-hover">
             <div tabIndex={0} role="button" className="btn btn-ghost">
@@ -32,11 +48,16 @@ const SelectedReposDropdown = () => {
                     tabIndex={0}
                     className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52"
                 >
+                    {/* TODO: SHOW IF CURRENT REPO IS IN FAVORATED REPOS AND MAKE IT ACTIVE */}
                     {favoritedRepos.map((repo) => {
                         return (
-                            <li key={repo.id}>
-                                <Link href={`/repo/${repo.name}`}>
-                                    <button className="btn btn-outline w-full">{repo.name}</button>
+                            <li key={repo.id} className="my-1">
+                                <Link
+                                    href={`/repo/${repo.name}`}
+                                    className="btn btn-outline w-full"
+                                >
+                                    
+                                    {repo.name}
                                 </Link>
                             </li>
                         );

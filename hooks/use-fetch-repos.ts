@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Octokit } from "@octokit/rest";
 import { Endpoints } from "@octokit/types";
 export type UserRepositories = Endpoints["GET /user/repos"]["response"]["data"];
+export type SingleUserRepository = Endpoints["GET /user/repos"]["response"]["data"]["0"];
 
 const useFetchRepos = () => {
     const [repos, setRepos] = useState<UserRepositories>([]);

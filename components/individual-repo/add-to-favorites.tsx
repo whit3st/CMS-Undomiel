@@ -1,10 +1,10 @@
 "use client";
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
-import { UserRepositories } from "@/hooks/use-fetch-repos";
+import { SingleUserRepository, UserRepositories } from "@/hooks/use-fetch-repos";
 const AddToFavorites = () => {
     const pathname = usePathname();
-    const [currentRepo, setCurrentRepo] = useState<UserRepositories>([]);
+    const [currentRepo, setCurrentRepo] = useState<SingleUserRepository>({} as SingleUserRepository);
     useEffect(() => {
         const CURRENT_REPO = pathname.split("/")[2];
 
@@ -15,7 +15,7 @@ const AddToFavorites = () => {
                 const repos = JSON.parse(ALL_REPOS) as UserRepositories;
                 const currentRepo = repos.find((repo) => repo.name === CURRENT_REPO);
                 if (currentRepo) {
-                    setCurrentRepo([currentRepo]);
+                    setCurrentRepo(currentRepo);
                 }
             }
         }
@@ -23,13 +23,13 @@ const AddToFavorites = () => {
 
     const addToFavorites = () => {
         // Add repo to local storage
-        const FAVORITED_REPOS = localStorage.getItem("FAVORITED_REPOS");
-        const favoritedRepos = JSON.parse(FAVORITED_REPOS!);
+        const FAVORITED_REPOS = JSON.parse(localStorage.getItem("FAVORITED_REPOS")!) as UserRepositories;
 
-        if (!favoritedRepos.includes(currentRepo)) {
-            favoritedRepos.push(currentRepo);
+        if (!FAVORITED_REPOS.some((repo) => repo.name === currentRepo.name)) {
+            FAVORITED_REPOS.push(currentRepo);
+            localStorage.setItem("FAVORITED_REPOS", JSON.stringify(FAVORITED_REPOS));
+            window.dispatchEvent(new Event("storage"));
         }
-        localStorage.setItem("FAVORITED_REPOS", JSON.stringify(favoritedRepos));
     };
     return (
         <button className="btn" onClick={addToFavorites}>
