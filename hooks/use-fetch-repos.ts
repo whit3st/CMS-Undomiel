@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Octokit } from "@octokit/rest";
 import { Endpoints } from "@octokit/types";
+import  type { } from "@octokit/openapi-types";
 export type UserRepositories = Endpoints["GET /user/repos"]["response"]["data"];
 export type SingleUserRepository = Endpoints["GET /user/repos"]["response"]["data"]["0"];
 

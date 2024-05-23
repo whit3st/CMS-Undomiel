@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@octokit/openapi-types": "^22.2.0",
     "@octokit/rest": "^20.1.1",
     "@octokit/types": "^13.5.0",
     "lucide-react": "^0.379.0",
