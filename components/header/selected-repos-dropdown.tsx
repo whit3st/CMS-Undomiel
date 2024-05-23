@@ -1,8 +1,11 @@
 import Link from "next/link";
 import type { UserRepositories } from "@/hooks/use-fetch-repos";
 import React, { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 
 const SelectedReposDropdown = () => {
+    const pathname = usePathname();
+    const CURRENT_REPO = pathname.split("/")[2];
     const [favoritedRepos, setFavoritedRepos] = useState<UserRepositories>([]);
     useEffect(() => {
         if (window && typeof window !== "undefined") {
@@ -46,17 +49,17 @@ const SelectedReposDropdown = () => {
             {favoritedRepos && favoritedRepos.length > 0 && (
                 <ul
                     tabIndex={0}
-                    className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52"
+                    className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52 border"
                 >
-                    {/* TODO: SHOW IF CURRENT REPO IS IN FAVORATED REPOS AND MAKE IT ACTIVE */}
                     {favoritedRepos.map((repo) => {
                         return (
                             <li key={repo.id} className="my-1">
                                 <Link
                                     href={`/repo/${repo.name}`}
-                                    className="btn btn-outline w-full"
+                                    className={`btn btn-sm w-full ${
+                                        CURRENT_REPO === repo.name ? "btn-neutral" : "btn-ghost"
+                                    }`}
                                 >
-                                    
                                     {repo.name}
                                 </Link>
                             </li>

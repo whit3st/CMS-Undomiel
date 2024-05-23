@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, Roboto, Playfair_Display, Jost } from "next/font/google";
 import "./globals.css";
+import { Toaster } from "sonner";
 import Header from "@/components/header/header";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -21,6 +22,7 @@ export default function RootLayout({
     return (
         <html lang="en" data-theme="light">
             <body className={jost.className + " container min-h-screen"}>
+                <Toaster richColors />
                 <Header />
                 {children}
             </body>

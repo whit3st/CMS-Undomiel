@@ -1,6 +1,6 @@
 "use client";
 
-import AllRepos from "@/components/all-repos";
+import AllRepos from "@/components/main-page/all-repos";
 import { useEffect, useState } from "react";
 
 export default function Home() {
