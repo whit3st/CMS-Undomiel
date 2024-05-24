@@ -8,6 +8,12 @@ import useFetchContentFolders from "@/hooks/use-fetch-content-folders";
 const Repo = ({ params }: { params: { id: string } }) => {
     const { currentRepo } = useGetCurrentRepo(params.id);
     const { folders, loading, error } = useFetchContentFolders(params.id);
+
+    useEffect(() => {
+        if (!window) return;
+        localStorage.setItem("CURRENT_REPO", JSON.stringify(currentRepo));
+        console.log("currentRepo changed");
+    }, [currentRepo]);
     return (
         <main>
             <section className="flex items-center gap-2">

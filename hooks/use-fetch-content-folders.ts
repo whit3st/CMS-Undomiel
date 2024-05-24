@@ -3,8 +3,7 @@ import { Octokit } from "@octokit/rest";
 import useGetCurrentRepo from "./use-get-current-repo";
 import type { Endpoints, RequestError } from "@octokit/types";
 type ResponseData = Endpoints["GET /repos/{owner}/{repo}/contents/{path}"]["response"]["data"];
-type FoldersType = Extract<ResponseData, { type: "dir" | "file" | "symlink" | "submodule" }[]>;
-type ErrorType = RequestError;
+export type FoldersType = Extract<ResponseData, { type: "dir" | "file" | "symlink" | "submodule" }[]>;
 const useFetchContentFolders = (repoName: string) => {
     const { currentRepo } = useGetCurrentRepo(repoName);
     const [folders, setFolders] = useState<FoldersType>();

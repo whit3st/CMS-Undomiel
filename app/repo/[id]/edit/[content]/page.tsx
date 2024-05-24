@@ -1,26 +1,14 @@
 "use client";
+import useFetchMarkdownFiles from "@/hooks/use-fetch-markdown-files";
+import { SingleUserRepository } from "@/hooks/use-fetch-repos";
+import { Octokit } from "@octokit/rest";
 import { ChevronLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { markAsUntransferable } from "worker_threads";
 const Repo = ({ params }: { params: { content: string } }) => {
     const router = useRouter();
-    const [data, setData] = useState({}) as {
-        markdown: string;
-        frontmatter: VFile;
-    };
-    const [file, setFile] = useState<string>("");
-
-    useEffect(() => {
-        const apicall = async () => {
-            const req = await fetch("/api/fetch-content");
-            const res = await req.json();
-            console.log(res);
-            setData(res);
-        };
-
-        apicall();
-    }, []);
+    const [data, setData] = useState({});
+    const { markdownFiles } = useFetchMarkdownFiles(`src/content/${params.content}`);
 
     return (
         <main>
@@ -28,9 +16,24 @@ const Repo = ({ params }: { params: { content: string } }) => {
                 <ChevronLeft />
                 Go back
             </button>
-            <p className="card-title">Current Viewing: {params.content}</p>
-            {data && <pre>{JSON.stringify(data, null, 2)}</pre>}
-            <textarea name="" value={data && data.markdown} cols={50} rows={10}></textarea>
+            <section className="flex gap-2">
+                {/* ALL MARKDOWN FILES */}
+                <aside className="flex flex-col">
+                    {markdownFiles &&
+                        markdownFiles.map((file) => (
+                            <button key={file.sha} className="btn btn-outline my-1 btn-sm">
+                                {file.name}
+                            </button>
+                        ))}
+                </aside>
+                <textarea
+                    name=""
+                    id=""
+                    className="border rounded-md grow"
+                    cols={100}
+                    rows={15}
+                ></textarea>
+            </section>
         </main>
     );
 };
