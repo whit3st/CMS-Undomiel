@@ -22,7 +22,7 @@ export default function myUnifiedPluginHandlingYamlMatter() {
      * @returns {undefined}
      *   Nothing.
      */
-    return function (tree, file) {
+    return function (tree: any, file: any) {
         matter(file);
     };
 }
