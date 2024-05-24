@@ -32,7 +32,6 @@ const Repo = ({ params }: { params: { id: string } }) => {
                         </Link>
                     ))}
             </section>
-            {/* <Link href={`/repo/${currentRepo.id}/edit/${currentRepo.id}`}>to /repo/[id]/edit/[content]</Link> */}
         </main>
     );
 };

@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@mdxeditor/editor": "^3.4.0",
     "@octokit/openapi-types": "^22.2.0",
     "@octokit/rest": "^20.1.1",
     "@octokit/types": "^13.5.0",
@@ -16,7 +17,13 @@
     "next": "14.2.3",
     "react": "^18",
     "react-dom": "^18",
-    "sonner": "^1.4.41"
+    "remark-frontmatter": "^5.0.0",
+    "remark-parse": "^11.0.0",
+    "remark-stringify": "^11.0.0",
+    "sonner": "^1.4.41",
+    "to-vfile": "^8.0.0",
+    "unified": "^11.0.4",
+    "vfile-matter": "^5.0.0"
   },
   "devDependencies": {
     "@types/node": "^20",
