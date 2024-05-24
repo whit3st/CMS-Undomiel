@@ -36,7 +36,7 @@ const useFetchContentFolders = (repoName: string) => {
                 }
             } catch (err) {
                 const error = err as Error;
-                setError(error);
+                setError(error.message);
             } finally {
                 setLoading(false);
             }
