@@ -3,6 +3,8 @@ import { SingleUserRepository, UserRepositories } from "./use-fetch-repos";
 import { Octokit } from "@octokit/rest";
 import type { FoldersType } from "./use-fetch-content-folders";
 const useFetchMarkdownFiles = (path: string) => {
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState("");
     const [markdownFiles, setMarkdownFiles] = useState<FoldersType>();
     useEffect(() => {
         if (!window) return;
@@ -22,6 +24,7 @@ const useFetchMarkdownFiles = (path: string) => {
                 auth: ACCESS_TOKEN,
             });
             try {
+                setLoading(true);
                 const response = await octokit.repos.getContent({
                     owner: "whit3st",
                     repo: "custom-cms-for-content-collections",
@@ -34,15 +37,20 @@ const useFetchMarkdownFiles = (path: string) => {
                     );
                     setMarkdownFiles(markdownFiles);
                 }
-            } catch (error) {
-                console.log(error);
+
+            } catch (err) {
+                const error = err as Error;
+                setError(error.message);
+                console.log(err);
+            } finally {
+                setLoading(false);
             }
         };
 
         fetchMarkdownFiles();
     }, [path]);
 
-    return { markdownFiles };
+    return { loading, error, markdownFiles };
 };
 
 export default useFetchMarkdownFiles;
