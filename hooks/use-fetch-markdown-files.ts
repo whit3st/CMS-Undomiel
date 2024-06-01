@@ -1,21 +1,20 @@
 import { useEffect, useState } from "react";
 import { SingleUserRepository, UserRepositories } from "./use-fetch-repos";
 import { Octokit } from "@octokit/rest";
-import type { FoldersType } from "./use-fetch-content-folders";
+import type { ResponseArray } from "@/hooks/types";
+import ls from "@/utils/ls";
 const useFetchMarkdownFiles = (path: string) => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
-    const [markdownFiles, setMarkdownFiles] = useState<FoldersType>();
+    const [markdownFiles, setMarkdownFiles] = useState<ResponseArray>([] as ResponseArray);
     useEffect(() => {
         if (!window) return;
 
         const fetchMarkdownFiles = async () => {
-            const ACCESS_TOKEN = localStorage.getItem("ACCESS_TOKEN");
-            const CURRENT_REPO = JSON.parse(
-                localStorage.getItem("CURRENT_REPO") as string
-            ) as SingleUserRepository;
+            const ACCESS_TOKEN = ls<string>("ACCESS_TOKEN");
+            const CURRENT_REPO = ls<SingleUserRepository>("CURRENT_REPO");
 
-            if (!ACCESS_TOKEN || !CURRENT_REPO.owner || !CURRENT_REPO.name) {
+            if (!ACCESS_TOKEN || !CURRENT_REPO || !CURRENT_REPO) {
                 console.log("Invalid repository details");
                 return;
             }
@@ -26,8 +25,8 @@ const useFetchMarkdownFiles = (path: string) => {
             try {
                 setLoading(true);
                 const response = await octokit.repos.getContent({
-                    owner: "whit3st",
-                    repo: "custom-cms-for-content-collections",
+                    owner: CURRENT_REPO.owner.login,
+                    repo: CURRENT_REPO.name,
                     path: path,
                 });
 
@@ -37,7 +36,6 @@ const useFetchMarkdownFiles = (path: string) => {
                     );
                     setMarkdownFiles(markdownFiles);
                 }
-
             } catch (err) {
                 const error = err as Error;
                 setError(error.message);

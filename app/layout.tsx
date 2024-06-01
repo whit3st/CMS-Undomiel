@@ -20,8 +20,8 @@ export default function RootLayout({
     children: React.ReactNode;
 }>) {
     return (
-        <html lang="en" data-theme="light">
-            <body className={jost.className + " container min-h-screen"}>
+        <html lang="en" data-theme="lofi">
+            <body className={jost.className + " px-6 min-h-screen"}>
                 <Toaster richColors />
                 <Header />
                 {children}

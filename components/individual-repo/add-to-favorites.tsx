@@ -4,6 +4,7 @@ import { usePathname } from "next/navigation";
 import { SingleUserRepository, UserRepositories } from "@/hooks/use-fetch-repos";
 import { toast } from "sonner";
 import { Heart } from "lucide-react";
+import ls from "@/utils/ls";
 const AddToFavorites = () => {
     const pathname = usePathname();
     const [currentRepo, setCurrentRepo] = useState<SingleUserRepository>(
@@ -13,11 +14,10 @@ const AddToFavorites = () => {
         const CURRENT_REPO = pathname.split("/")[2];
 
         if (window && typeof window !== "undefined") {
-            const ALL_REPOS = localStorage.getItem("ALL_REPOS");
+            const ALL_REPOS = ls<UserRepositories>("ALL_REPOS");
 
             if (ALL_REPOS) {
-                const repos = JSON.parse(ALL_REPOS) as UserRepositories;
-                const currentRepo = repos.find((repo) => repo.name === CURRENT_REPO);
+                const currentRepo = ALL_REPOS.find((repo) => repo.name === CURRENT_REPO);
                 if (currentRepo) {
                     setCurrentRepo(currentRepo);
                 }
@@ -27,11 +27,9 @@ const AddToFavorites = () => {
 
     const addToFavorites = () => {
         // Add repo to local storage
-        const FAVORITED_REPOS = JSON.parse(
-            localStorage.getItem("FAVORITED_REPOS")!
-        ) as UserRepositories;
+        const FAVORITED_REPOS = ls<UserRepositories>("FAVORITED_REPOS");
 
-        if (!FAVORITED_REPOS.some((repo) => repo.name === currentRepo.name)) {
+        if (FAVORITED_REPOS && !FAVORITED_REPOS.some((repo) => repo.name === currentRepo.name)) {
             FAVORITED_REPOS.push(currentRepo);
             localStorage.setItem("FAVORITED_REPOS", JSON.stringify(FAVORITED_REPOS));
             window.dispatchEvent(new Event("storage"));

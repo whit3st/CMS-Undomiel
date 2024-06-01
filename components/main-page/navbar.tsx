@@ -1,6 +1,11 @@
+import { FolderSync } from "lucide-react";
 import React, { Dispatch, SetStateAction, useRef } from "react";
 
-const Navbar = ({ state }: { state: { inputValue: string; setInputValue: Dispatch<SetStateAction<string>> }}) => {
+const Navbar = ({
+    state,
+}: {
+    state: { inputValue: string; setInputValue: Dispatch<SetStateAction<string>> };
+}) => {
     const inputRef = useRef<HTMLInputElement>(null);
     const InputHandler = () => {
         state.setInputValue(inputRef.current!.value);
@@ -12,11 +17,11 @@ const Navbar = ({ state }: { state: { inputValue: string; setInputValue: Dispatc
     };
     return (
         <aside className="flex gap-4 items-center justify-end">
-            <button className="btn" onClick={forceRefresh}>
-                Refresh
+            <button className="btn btn-ghost" onClick={forceRefresh} title="Force Refresh">
+                <FolderSync />
             </button>
             <section className="flex gap-2 items-center">
-                <label className="input input-bordered flex items-center">
+                <label className="input input-bordered flex items-center w-72">
                     <input
                         ref={inputRef}
                         value={state.inputValue}

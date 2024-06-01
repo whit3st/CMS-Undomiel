@@ -1,9 +1,11 @@
 "use client";
 
 import React, { useEffect } from "react";
-import Image from "next/image";
 import { Octokit } from "@octokit/rest";
-import SelectedReposDropdown from "./selected-repos-dropdown";
+import SelectedReposDropdown from "./favorited-repos-dropdown";
+import UploadImage from "./upload-image";
+import { LogOut } from "lucide-react";
+import ImagesDropdown from "./images-dropdown";
 const UserBanner = () => {
     const [profilePicture, setProfilePicture] = React.useState("");
     const [userName, setUserName] = React.useState("");
@@ -46,12 +48,14 @@ const UserBanner = () => {
     if (profilePicture && userName) {
         return (
             <aside className="flex gap-4 items-center">
+                <ImagesDropdown />
+                <UploadImage />
                 <SelectedReposDropdown />
                 <p>
                     Logged in as <b>{userName}</b>
                 </p>
-                <button className="btn" onClick={logout}>
-                    Logout
+                <button className="btn btn-ghost" onClick={logout}>
+                    <LogOut />
                 </button>
             </aside>
         );

@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { Octokit } from "@octokit/rest";
 import { Endpoints } from "@octokit/types";
-import  type { } from "@octokit/openapi-types";
+import type {} from "@octokit/openapi-types";
+import ls from "@/utils/ls";
 export type UserRepositories = Endpoints["GET /user/repos"]["response"]["data"];
 export type SingleUserRepository = Endpoints["GET /user/repos"]["response"]["data"]["0"];
 
@@ -56,16 +57,16 @@ const useFetchRepos = () => {
             };
 
             // get access token from local storage
-            const ACCESS_TOKEN = localStorage.getItem("ACCESS_TOKEN");
+            const ACCESS_TOKEN = ls<string>("ACCESS_TOKEN");
             // get all repos cache from local storage
-            const ALL_REPOS_ON_LOCAL_STORAGE = localStorage.getItem("ALL_REPOS");
+            const ALL_REPOS_ON_LOCAL_STORAGE = ls<UserRepositories>("ALL_REPOS");
 
             if (ACCESS_TOKEN && !ALL_REPOS_ON_LOCAL_STORAGE) {
                 fetchRepos(ACCESS_TOKEN);
             }
 
             if (ALL_REPOS_ON_LOCAL_STORAGE) {
-                setRepos(JSON.parse(ALL_REPOS_ON_LOCAL_STORAGE));
+                setRepos(ALL_REPOS_ON_LOCAL_STORAGE);
             }
         }
     }, []);
