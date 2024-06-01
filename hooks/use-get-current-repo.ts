@@ -3,35 +3,34 @@ import type { SingleUserRepository, UserRepositories } from "./use-fetch-repos";
 import ls from "@/utils/ls";
 
 const useGetCurrentRepo = (currentRepoName?: string) => {
-    const [currentRepo, setCurrentRepo] = useState<SingleUserRepository>(
-        {} as SingleUserRepository
-    );
-    const [CurrentRepoFromLocalStorage, setCurrentRepoFromLocalStorage] =
-        useState<SingleUserRepository>({} as SingleUserRepository);
+    const [currentRepo, setCurrentRepo] = useState<SingleUserRepository>();
+
     useEffect(() => {
         if (!window) return;
+        console.log(typeof currentRepoName, currentRepoName);
+        if (currentRepoName) {
+            console.log("currentRepoName exists, continue");
+            const ALL_REPOS = ls<UserRepositories>("ALL_REPOS");
+            if (!ALL_REPOS) return;
 
-        const ALL_REPOS = ls<UserRepositories>("ALL_REPOS");
-        if (!ALL_REPOS) return;
+            const CURRENT_REPO = ALL_REPOS.find((repo) => repo.name === currentRepoName);
+            if (!CURRENT_REPO) return;
 
-        const currentRepo = ALL_REPOS.find((repo) => repo.name === currentRepoName);
-        if (!currentRepo) return;
-
-        setCurrentRepo(currentRepo);
-        localStorage.setItem("CURRENT_REPO", JSON.stringify(currentRepo));
-        const currentRepoChangeEvent = new Event("currentRepoChanged");
-        window.dispatchEvent(currentRepoChangeEvent);
-
-
-        // if currentRepoName is not provided, get currentRepo from local storage
-        const CurrentRepoFromLocalStorage = ls<SingleUserRepository>("CURRENT_REPO");
-
-        if (CurrentRepoFromLocalStorage) {
-            setCurrentRepoFromLocalStorage(CurrentRepoFromLocalStorage);
+            setCurrentRepo(CURRENT_REPO);
+            localStorage.setItem("CURRENT_REPO", JSON.stringify(CURRENT_REPO));
+        } else {
+            console.log("no currentRepoName");
+            const CURRENT_REPO_FROM_LOCALSTORAGE = ls<SingleUserRepository>("CURRENT_REPO");
+            if (CURRENT_REPO_FROM_LOCALSTORAGE) {
+                setCurrentRepo(CURRENT_REPO_FROM_LOCALSTORAGE);
+                console.log("got local storage");
+            } else {
+                console.log("no luck");
+            }
         }
     }, [currentRepoName]);
 
-    return { currentRepo, CurrentRepoFromLocalStorage };
+    return { currentRepo };
 };
 
 export default useGetCurrentRepo;

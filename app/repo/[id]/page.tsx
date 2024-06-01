@@ -13,7 +13,7 @@ const Repo = ({ params }: { params: { id: string } }) => {
             <section className="flex items-center gap-2">
                 <GoBack />
                 <AddToFavorites />
-                <p className="card-title">Current Viewing: {currentRepo.name}</p>
+                <p className="card-title">Current Viewing: {currentRepo?.name}</p>
             </section>
             <section className="py-6">
                 <h2 className="text-2xl py-2">Content Collections:</h2>

@@ -26,7 +26,7 @@ const useFetchContentFolders = (repoName: string): ReturnedType => {
         });
 
         const fetchFolders = async () => {
-            if (!currentRepo.owner) return;
+            if (!currentRepo) return;
             try {
                 const path = "src/content";
                 const response = await octokit.repos.getContent({
