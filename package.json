@@ -36,7 +36,8 @@
     "sonner": "^1.4.41",
     "to-vfile": "^8.0.0",
     "unified": "^11.0.4",
-    "vfile-matter": "^5.0.0"
+    "vfile-matter": "^5.0.0",
+    "zustand": "^4.5.2"
   },
   "devDependencies": {
     "@tailwindcss/typography": "^0.5.13",

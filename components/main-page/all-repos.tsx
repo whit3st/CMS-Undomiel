@@ -1,7 +1,7 @@
 "use client";
 import useFetchRepos from "@/hooks/use-fetch-repos";
 import Link from "next/link";
-import { useRef, useState } from "react";
+import { useState } from "react";
 import Navbar from "./navbar";
 
 const AllRepos = () => {

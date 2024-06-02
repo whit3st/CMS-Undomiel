@@ -1,19 +1,17 @@
 "use client";
 
 import AllRepos from "@/components/main-page/all-repos";
-import ls from "@/utils/ls";
-import { useEffect, useState } from "react";
-
+import { useEffect } from "react";
+import { useCurrentRepo, useAccessToken } from "@/store/store";
 export default function Home() {
-    const [loading, setLoading] = useState(true);
+    const { setCurrentRepo } = useCurrentRepo();
+    const { accessToken } = useAccessToken();
     useEffect(() => {
-        if (window && typeof window !== "undefined") {
-            const ACCESS_TOKEN = ls<string>("ACCESS_TOKEN");
-            if (!ACCESS_TOKEN) {
-                window.location.assign("/auth");
-            }
+        if (!accessToken) {
+            window.location.assign("/auth");
         }
-    }, []);
+        setCurrentRepo(null);
+    }, [accessToken, setCurrentRepo]);
 
     return (
         <main className="grid gap-5">

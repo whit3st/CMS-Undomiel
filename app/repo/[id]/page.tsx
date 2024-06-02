@@ -1,12 +1,23 @@
 "use client";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import GoBack from "@/components/individual-repo/go-back";
 import AddToFavorites from "@/components/individual-repo/add-to-favorites";
-import useGetCurrentRepo from "@/hooks/use-get-current-repo";
 import Link from "next/link";
 import useFetchContentFolders from "@/hooks/use-fetch-content-folders";
+import { useCurrentRepo } from "@/store/store";
+import ls from "@/utils/ls";
+import { UserRepositories } from "@/hooks/use-fetch-repos";
 const Repo = ({ params }: { params: { id: string } }) => {
-    const { currentRepo } = useGetCurrentRepo(params.id);
+    const { currentRepo, setCurrentRepo } = useCurrentRepo();
+    useEffect(() => {
+        if (!window) return;
+        const ALL_REPOS = ls<UserRepositories>("ALL_REPOS");
+        if (!ALL_REPOS) return;
+        const CURRENT_REPO = ALL_REPOS.find((repo) => repo.name === params.id);
+        if (!CURRENT_REPO) return;
+        setCurrentRepo(CURRENT_REPO);
+    }, [params.id, setCurrentRepo]);
+
     const { folders, loading, error } = useFetchContentFolders(params.id);
     return (
         <main>

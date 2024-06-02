@@ -4,10 +4,9 @@ import { Octokit } from "@octokit/rest";
 import { toast } from "sonner";
 import { SingleUserRepository } from "@/hooks/use-fetch-repos";
 import ls from "@/utils/ls";
+import { useCurrentRepo } from "@/store/store";
 const UploadImage = () => {
-    const [currentRepo, setCurrentRepo] = useState<SingleUserRepository>(
-        {} as SingleUserRepository
-    );
+    const { currentRepo } = useCurrentRepo();
     const modalRef = useRef<HTMLDialogElement>(null);
     const inputRef = useRef<HTMLInputElement>(null);
     const [loading, setLoading] = useState(false);
@@ -67,63 +66,48 @@ const UploadImage = () => {
                 };
         }
     };
-
-    useEffect(() => {
-        const fetchCurrentRepo = () => {
-            console.log("current repo fetched");
-            const CURRENT_REPO = ls<SingleUserRepository>("CURRENT_REPO");
-            if (CURRENT_REPO) {
-                setCurrentRepo(CURRENT_REPO);
-            }
-        };
-        fetchCurrentRepo();
-
-        window.addEventListener("currentRepoChanged", fetchCurrentRepo);
-
-        return () => {
-            window.removeEventListener("currentRepoChanged", fetchCurrentRepo);
-        };
-    }, []);
-    return (
-        <>
-            <button className="btn btn-ghost" onClick={openModal} title="Upload Image">
-                <ImageUp />
-            </button>
-            <dialog id="uploadImageModal" ref={modalRef} className="modal">
-                <section className="modal-box">
-                    <aside className="flex w-full justify-between">
-                        <h3 className="font-bold text-lg">Upload Image</h3>
-                        <CloseModalButton />
-                    </aside>
-                    <section className="my-8 flex flex-col gap-2">
-                        <p className="opacity-90 text-xs leading-normal">
-                            *All images will be uploaded to the{" "}
-                            <b>
-                                <i>public/undomielcms/images</i>
-                            </b>{" "}
-                            path of the <b>{currentRepo.name}</b> repository.
+    if (currentRepo) {
+        return (
+            <>
+                <button className="btn btn-ghost" onClick={openModal} title="Upload Image">
+                    <ImageUp />
+                </button>
+                <dialog id="uploadImageModal" ref={modalRef} className="modal">
+                    <section className="modal-box">
+                        <aside className="flex w-full justify-between">
+                            <h3 className="font-bold text-lg">Upload Image</h3>
+                            <CloseModalButton />
+                        </aside>
+                        <section className="my-8 flex flex-col gap-2">
+                            <p className="opacity-90 text-xs leading-normal">
+                                *All images will be uploaded to the{" "}
+                                <b>
+                                    <i>public/undomielcms/images</i>
+                                </b>{" "}
+                                path of the <b>{currentRepo.name}</b> repository.
+                            </p>
+                            <input
+                                type="file"
+                                className="file-input file-input-primary file-input-bordered w-full mt-6 mb-4"
+                                accept="image/webp, image/png, image/jpeg"
+                                ref={inputRef}
+                            />
+                            {loading && <progress className="progress progress-primary w-full" />}
+                            {!loading && (
+                                <button className="btn btn-outline" onClick={uploadImageHandler}>
+                                    Upload
+                                </button>
+                            )}
+                        </section>
+                        <p className="text-sm">
+                            <b>Caution:</b> Images effect loading speed. Use <b>compressed</b> and
+                            <b> optimized</b> images for best results.
                         </p>
-                        <input
-                            type="file"
-                            className="file-input file-input-primary file-input-bordered w-full mt-6 mb-4"
-                            accept="image/webp, image/png, image/jpeg"
-                            ref={inputRef}
-                        />
-                        {loading && <progress className="progress progress-primary w-full" />}
-                        {!loading && (
-                            <button className="btn btn-outline" onClick={uploadImageHandler}>
-                                Upload
-                            </button>
-                        )}
                     </section>
-                    <p className="text-sm">
-                        <b>Caution:</b> Images effect loading speed. Use <b>compressed</b> and
-                        <b> optimized</b> images for best results.
-                    </p>
-                </section>
-            </dialog>
-        </>
-    );
+                </dialog>
+            </>
+        );
+    }
 };
 
 export default UploadImage;
