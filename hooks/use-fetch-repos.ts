@@ -1,16 +1,16 @@
 import { useState, useEffect } from "react";
 import { Octokit } from "@octokit/rest";
 import { Endpoints } from "@octokit/types";
-import type {} from "@octokit/openapi-types";
 import ls from "@/utils/ls";
 export type UserRepositories = Endpoints["GET /user/repos"]["response"]["data"];
 export type SingleUserRepository = Endpoints["GET /user/repos"]["response"]["data"]["0"];
+import { useAllRepos, useAccessToken } from "@/store/store";
 
 const useFetchRepos = () => {
-    const [repos, setRepos] = useState<UserRepositories>([]);
+    const { allRepos, setAllRepos } = useAllRepos();
+    const { accessToken } = useAccessToken();
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    const [currentCheckedRepo, setCurrentCheckedRepo] = useState<string | null>(null);
 
     useEffect(() => {
         if (window && typeof window !== "undefined") {
@@ -24,7 +24,6 @@ const useFetchRepos = () => {
                     for (const repo of ALL_REPOS) {
                         const { owner, name } = repo;
                         try {
-                            setCurrentCheckedRepo(`Currently checked repo: ${name}`);
                             await octokit.repos.getContent({
                                 owner: owner.login,
                                 repo: name,
@@ -40,7 +39,7 @@ const useFetchRepos = () => {
                                 "ALL_REPOS",
                                 JSON.stringify(REPOS_WITH_ASTRO_CONFIG)
                             );
-                            setRepos(REPOS_WITH_ASTRO_CONFIG);
+                            setAllRepos(ALL_REPOS);
                         }
                     }
                 } catch (err) {
@@ -49,28 +48,23 @@ const useFetchRepos = () => {
                     setError(error.message);
                 } finally {
                     setLoading(false);
-                    setTimeout(() => {
-                        setCurrentCheckedRepo(null);
-                    }, 2000);
-                    setCurrentCheckedRepo("Finalizing...");
+                    setTimeout(() => {}, 2000);
                 }
             };
 
-            // get access token from local storage
-            const ACCESS_TOKEN = ls<string>("ACCESS_TOKEN");
             // get all repos cache from local storage
-            const ALL_REPOS_ON_LOCAL_STORAGE = ls<UserRepositories>("ALL_REPOS");
+            const allReposOnLocalStorage = ls<UserRepositories>("ALL_REPOS");
 
-            if (ACCESS_TOKEN && !ALL_REPOS_ON_LOCAL_STORAGE) {
-                fetchRepos(ACCESS_TOKEN);
+            if (accessToken && !allReposOnLocalStorage) {
+                fetchRepos(accessToken);
             }
 
-            if (ALL_REPOS_ON_LOCAL_STORAGE) {
-                setRepos(ALL_REPOS_ON_LOCAL_STORAGE);
+            if (allReposOnLocalStorage) {
+                setAllRepos(allReposOnLocalStorage);
             }
         }
     }, []);
-    return { repos, loading, error, currentCheckedRepo };
+    return { allRepos, loading, error };
 };
 
 export default useFetchRepos;
