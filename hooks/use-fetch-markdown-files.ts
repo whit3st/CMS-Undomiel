@@ -3,6 +3,7 @@ import { SingleUserRepository, UserRepositories } from "./use-fetch-repos";
 import { Octokit } from "@octokit/rest";
 import type { ResponseArray } from "@/hooks/types";
 import ls from "@/utils/ls";
+import { toast } from "sonner";
 const useFetchMarkdownFiles = (path: string) => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
@@ -15,7 +16,7 @@ const useFetchMarkdownFiles = (path: string) => {
             const CURRENT_REPO = ls<SingleUserRepository>("CURRENT_REPO");
 
             if (!ACCESS_TOKEN || !CURRENT_REPO || !CURRENT_REPO) {
-                console.log("Invalid repository details");
+                toast.error("Invalid repository details");
                 return;
             }
 

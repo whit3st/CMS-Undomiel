@@ -2,16 +2,16 @@
 
 import AllRepos from "@/components/main-page/all-repos";
 import { useEffect } from "react";
-import { useCurrentRepo, useAccessToken } from "@/store/store";
+import { useCurrentRepo } from "@/store/store";
 export default function Home() {
     const { setCurrentRepo } = useCurrentRepo();
-    const { accessToken } = useAccessToken();
     useEffect(() => {
-        if (!accessToken) {
+        const ACCESS_TOKEN = localStorage.getItem("ACCESS_TOKEN");
+        if (!ACCESS_TOKEN) {
             window.location.assign("/auth");
         }
         setCurrentRepo(null);
-    }, [accessToken, setCurrentRepo]);
+    }, [setCurrentRepo]);
 
     return (
         <main className="grid gap-5">

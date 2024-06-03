@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import { ImageUp, X } from "lucide-react";
 import { Octokit } from "@octokit/rest";
-import { toast } from "sonner";
+import { Toaster, toast } from "sonner";
 import { SingleUserRepository } from "@/hooks/use-fetch-repos";
 import ls from "@/utils/ls";
 import { useCurrentRepo } from "@/store/store";
+import { Button } from "../ui/button";
 const UploadImage = () => {
     const { currentRepo } = useCurrentRepo();
     const modalRef = useRef<HTMLDialogElement>(null);
@@ -29,6 +30,11 @@ const UploadImage = () => {
                 reader.onerror = reject;
             });
 
+            console.log(inputRef.current?.files?.[0]);
+        if (!inputRef.current?.files?.[0]) {
+            toast.error("No image selected");
+            return;
+        }
         const base64Image = await toBase64(inputRef.current?.files?.[0] as File);
         const imageData = {
             name: inputRef.current?.files?.[0].name,
@@ -59,7 +65,6 @@ const UploadImage = () => {
             const updateImagesEvent = new Event("updateImages");
             window.dispatchEvent(updateImagesEvent);
         } catch (error) {
-            console.log(error);
             toast.error("Error uploading image"),
                 {
                     description: (error as Error).message,
@@ -69,10 +74,11 @@ const UploadImage = () => {
     if (currentRepo) {
         return (
             <>
-                <button className="btn btn-ghost" onClick={openModal} title="Upload Image">
+                <Button className="btn btn-ghost" onClick={openModal} title="Upload Image">
                     <ImageUp />
-                </button>
+                </Button>
                 <dialog id="uploadImageModal" ref={modalRef} className="modal">
+                    <Toaster richColors />
                     <section className="modal-box">
                         <aside className="flex w-full justify-between">
                             <h3 className="font-bold text-lg">Upload Image</h3>
@@ -94,9 +100,9 @@ const UploadImage = () => {
                             />
                             {loading && <progress className="progress progress-primary w-full" />}
                             {!loading && (
-                                <button className="btn btn-outline" onClick={uploadImageHandler}>
+                                <Button className="btn btn-outline" onClick={uploadImageHandler}>
                                     Upload
-                                </button>
+                                </Button>
                             )}
                         </section>
                         <p className="text-sm">
@@ -115,9 +121,9 @@ export default UploadImage;
 const CloseModalButton = () => {
     return (
         <form method="dialog">
-            <button className="btn btn-sm btn-circle btn-ghost">
+            <Button className="btn btn-sm btn-circle btn-ghost">
                 <X />
-            </button>
+            </Button>
         </form>
     );
 };

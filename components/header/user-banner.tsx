@@ -6,6 +6,7 @@ import SelectedReposDropdown from "./favorited-repos-dropdown";
 import UploadImage from "./upload-image";
 import { LogOut } from "lucide-react";
 import ImagesDropdown from "./images-dropdown";
+import { Button } from "../ui/button";
 const UserBanner = () => {
     const [profilePicture, setProfilePicture] = React.useState("");
     const [userName, setUserName] = React.useState("");
@@ -54,9 +55,9 @@ const UserBanner = () => {
                 <p>
                     Logged in as <b>{userName}</b>
                 </p>
-                <button className="btn btn-ghost" onClick={logout}>
+                <Button className="btn btn-ghost" onClick={logout}>
                     <LogOut />
-                </button>
+                </Button>
             </aside>
         );
     }

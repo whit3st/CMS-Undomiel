@@ -1,5 +1,6 @@
 import { FolderSync } from "lucide-react";
 import React, { Dispatch, SetStateAction, useRef } from "react";
+import { Button } from "../ui/button";
 
 const Navbar = ({
     state,
@@ -17,9 +18,9 @@ const Navbar = ({
     };
     return (
         <aside className="flex gap-4 items-center justify-end">
-            <button className="btn btn-ghost" onClick={forceRefresh} title="Force Refresh">
+            <Button className="btn btn-ghost" onClick={forceRefresh} title="Force Refresh">
                 <FolderSync />
-            </button>
+            </Button>
             <section className="flex gap-2 items-center">
                 <label className="input input-bordered flex items-center w-72">
                     <input

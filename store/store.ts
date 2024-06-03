@@ -10,22 +10,3 @@ export const useCurrentRepo = create<CurrentRepo>((set) => ({
     setCurrentRepo: (repo: SingleUserRepository | null) => set({ currentRepo: repo }),
 }));
 
-type AccessToken = {
-    accessToken: string | null;
-    setAccessToken: (token: string) => void;
-};
-
-export const useAccessToken = create<AccessToken>((set) => ({
-    accessToken: null,
-    setAccessToken: (token: string) => set({ accessToken: token }),
-}));
-
-type AllRepos = {
-    allRepos: UserRepositories | null;
-    setAllRepos: (repos: UserRepositories) => void;
-};
-
-export const useAllRepos = create<AllRepos>((set) => ({
-    allRepos: null,
-    setAllRepos: (repos: UserRepositories) => set({ allRepos: repos }),
-}));

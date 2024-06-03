@@ -5,19 +5,22 @@ import { useState } from "react";
 import Navbar from "./navbar";
 
 const AllRepos = () => {
-    const { allRepos, loading, error } = useFetchRepos();
+    const { allRepos, message, loading, error } = useFetchRepos();
     const [inputValue, setInputValue] = useState<string>("");
-
-    if (loading && allRepos) {
+    //  absolute top-1/2 left-1/2 translate-x-[-50%] translate-y-[-50%]
+    if (loading) {
         return (
-            <span className="loading loading-dots loading-lg absolute top-1/2 left-1/2 translate-x-[-50%] translate-y-[-50%]"></span>
+            <div className="flex flex-col justify-center items-center mx-auto">
+                <span className="loading loading-dots loading-lg"></span>
+                <p className="text-lg">{message}</p>
+            </div>
         );
     }
 
     if (error) {
         return <pre>{JSON.stringify(error, null, 2)}.</pre>;
     }
-    if (allRepos && allRepos.length > 0) {
+    if (allRepos) {
         return (
             <>
                 <Navbar state={{ inputValue, setInputValue }} />

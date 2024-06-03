@@ -1,20 +1,31 @@
 import { SingleUserRepository } from "@/hooks/use-fetch-repos";
 import useGetCurrentRepo from "@/hooks/use-get-current-repo";
 import { Octokit } from "@octokit/rest";
-import { Images, X } from "lucide-react";
+import { Images, RefreshCcw, X, XCircle } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
 import Image from "next/image";
-import { toast } from "sonner";
+import { Toaster, toast } from "sonner";
 import ls from "@/utils/ls";
 import { useCurrentRepo } from "@/store/store";
+import { Button } from "@/components/ui/button";
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+    DialogClose,
+} from "@/components/ui/dialog";
 const ImagesDropdown = () => {
     const { currentRepo } = useCurrentRepo();
+    const [accessToken, setAccessToken] = useState<string>("");
     const modalRef = useRef<HTMLDialogElement>(null);
     type ImagesType = {
         src: string;
         name: string;
     };
-    const [images, setImages] = useState<ImagesType[]>([] as ImagesType[]);
+    const [images, setImages] = useState<ImagesType[] | null>();
     const openModal = () => {
         const modal = modalRef.current;
         if (modal) {
@@ -28,110 +39,112 @@ const ImagesDropdown = () => {
         toast.success("Copied!");
     };
 
-    useEffect(() => {
-        const ACCESS_TOKEN = ls<string>("ACCESS_TOKEN");
+    const getImages = async (accessToken: string, currentRepo: SingleUserRepository) => {
+        // wait for github to push images
+        // await new Promise((resolve) => setTimeout(resolve, 4000));
+        const octokit = new Octokit({
+            auth: accessToken,
+        });
 
-        if (!ACCESS_TOKEN || !currentRepo) return;
-
-        const getImages = async () => {
-            // wait for github to push images
-            // await new Promise((resolve) => setTimeout(resolve, 4000));
-            const octokit = new Octokit({
-                auth: ACCESS_TOKEN,
+        try {
+            const response = await octokit.repos.getContent({
+                owner: currentRepo.owner.login,
+                repo: currentRepo.name,
+                path: "public/undomielcms/images",
             });
 
-            try {
-                const response = await octokit.repos.getContent({
-                    owner: currentRepo.owner.login,
-                    repo: currentRepo.name,
-                    path: "public/undomielcms/images",
+            if (Array.isArray(response.data)) {
+                const imageFiles = response.data.filter((item) => item.type === "file");
+
+                const imagePromises = imageFiles.map(async (item) => {
+                    const { data } = await octokit.repos.getContent({
+                        owner: currentRepo.owner.login,
+                        repo: currentRepo.name,
+                        path: item.path,
+                        headers: {
+                            accept: "application/vnd.github+json",
+                        },
+                    });
+                    if (!Array.isArray(data) && data.type === "file") {
+                        // Assuming the content is base64 encoded, convert it to utf-8
+
+                        const imageData = data.content.split("\n").join("");
+
+                        const withMetadata = `data:image/${
+                            data.name.split(".")[1]
+                        };base64,${imageData}`;
+
+                        return {
+                            src: withMetadata,
+                            name: data.name,
+                        };
+                    }
                 });
 
-                if (Array.isArray(response.data)) {
-                    const imageFiles = response.data.filter((item) => item.type === "file");
-
-                    const imagePromises = imageFiles.map(async (item) => {
-                        const { data } = await octokit.repos.getContent({
-                            owner: currentRepo.owner.login,
-                            repo: currentRepo.name,
-                            path: item.path,
-                            headers: {
-                                accept: "application/vnd.github+json",
-                            },
-                        });
-                        if (!Array.isArray(data) && data.type === "file") {
-                            // Assuming the content is base64 encoded, convert it to utf-8
-
-                            const imageData = data.content.split("\n").join("");
-
-                            const withMetadata = `data:image/${
-                                data.name.split(".")[1]
-                            };base64,${imageData}`;
-
-                            return {
-                                src: withMetadata,
-                                name: data.name,
-                            };
-                        }
-                    });
-
-                    const imagesData = (await Promise.all(imagePromises)) as ImagesType[];
-                    setImages(imagesData);
-                }
-            } catch (err) {
-                console.error("Error fetching images:", err);
+                const imagesData = (await Promise.all(imagePromises)) as ImagesType[];
+                setImages(imagesData);
             }
-        };
-
-        getImages();
-    }, [currentRepo]);
+        } catch (err) {
+            console.error("Error fetching images:", err);
+            setImages(null);
+        }
+    };
+    useEffect(() => {
+        const ACCESS_TOKEN = ls<string>("ACCESS_TOKEN");
+        if (ACCESS_TOKEN) {
+            setAccessToken(ACCESS_TOKEN);
+        }
+        if (!currentRepo) return;
+        getImages(accessToken, currentRepo);
+    }, [accessToken, currentRepo]);
 
     if (currentRepo) {
         return (
-            <>
-                <button className="btn btn-ghost" onClick={openModal} title="Select Image">
+            <Dialog>
+                <DialogTrigger>
                     <Images />
-                </button>
-                <dialog id="uploadImageModal" ref={modalRef} className="modal">
-                    <section className="bg-white rounded-md p-5 w-[calc(100vw-10rem)]">
-                        <aside className="flex justify-between p-4">
-                            <h3 className="text-lg font-bold">
-                                Select Image from {currentRepo?.name}
-                            </h3>
-                            <CloseModalButton />
-                        </aside>
-                        <aside className="grid grid-cols-5 gap-2 h-[80vh] overflow-y-auto">
-                            {images ? (
-                                images.map((image) => (
+                </DialogTrigger>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Select Image from {currentRepo?.name}</DialogTitle>
+                        <Button
+                            variant={"outline"}
+                            className="btn btn-sm btn-ghost"
+                            onClick={() => getImages(accessToken, currentRepo)}
+                            title="Force Refresh"
+                        >
+                            <RefreshCcw />
+                        </Button>
+                        <DialogClose className="ml-auto">
+                            <X />
+                        </DialogClose>
+                    </DialogHeader>
+                    <aside className="grid grid-cols-6 gap-1 h-[80vh] overflow-y-auto">
+                        {images ? (
+                            images.map((image) => (
+                                <Button
+                                    variant={"outline"}
+                                    className="w-60 h-60 overflow-clip"
+                                    key={image.name}
+                                    onClick={() => copyHandler(image.name)}
+                                >
                                     <Image
-                                        key={image.name}
                                         src={image.src}
                                         alt="image"
-                                        className="w-64 h-64 object-cover btn p-1 btn-outline"
+                                        className="object-cover"
                                         width={300}
                                         height={300}
-                                        onClick={() => copyHandler(image.name)}
                                     />
-                                ))
-                            ) : (
-                                <p className="text-center">No images found</p>
-                            )}
-                        </aside>
-                    </section>
-                </dialog>
-            </>
+                                </Button>
+                            ))
+                        ) : (
+                            <p className="text-start text-lg">No images found</p>
+                        )}
+                    </aside>
+                </DialogContent>
+            </Dialog>
         );
     }
 };
 
 export default ImagesDropdown;
-
-const CloseModalButton = () => {
-    return (
-        <form method="dialog">
-            <button className="btn btn-sm btn-circle btn-ghost">
-                <X />
-            </button>
-        </form>
-    );
-};

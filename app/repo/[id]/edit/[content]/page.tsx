@@ -10,6 +10,8 @@ import remarkGfm from "remark-gfm";
 import Markdown from "react-markdown";
 import ls from "@/utils/ls";
 import { SingleUserRepository } from "@/hooks/use-fetch-repos";
+import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
 
 const Repo = ({ params }: { params: { content: string } }) => {
     const router = useRouter();
@@ -59,8 +61,6 @@ const Repo = ({ params }: { params: { content: string } }) => {
                     _sha: sha,
                 }),
             });
-            const data = await response.json();
-            console.log(data);
         }
     };
 
@@ -70,10 +70,10 @@ const Repo = ({ params }: { params: { content: string } }) => {
 
     return (
         <main>
-            <button className="btn mb-6 border hover:border-inherit" onClick={() => router.back()}>
+            <Button className="btn mb-6 border hover:border-inherit" onClick={() => router.back()}>
                 <ChevronLeft />
                 Go back
-            </button>
+            </Button>
             <section className="flex border rounded-md overflow-clip h-[600px]">
                 {/* ALL MARKDOWN FILES */}
 
@@ -84,7 +84,7 @@ const Repo = ({ params }: { params: { content: string } }) => {
                     {error && <p>{error}</p>}
                     {markdownFiles &&
                         markdownFiles.map((file) => (
-                            <button
+                            <Button
                                 key={file.sha}
                                 onClick={() => setSelectedMarkdownFilePath(file.path)}
                                 className={`px-2 truncate text-start py-1.5 ${
@@ -95,7 +95,7 @@ const Repo = ({ params }: { params: { content: string } }) => {
                                 title={file.name}
                             >
                                 {file.name.replace(".md", "")}
-                            </button>
+                            </Button>
                         ))}
                 </aside>
                 {contents && contents.data && (
@@ -137,23 +137,19 @@ const Repo = ({ params }: { params: { content: string } }) => {
                                 contentEditable
                                 onInput={(e) => {
                                     setContents({ ...contents, content: e.currentTarget.value });
-                                    console.log(e.currentTarget.value);
                                 }}
                             ></textarea>
                             <aside className="flex border-r">
-                                <button onClick={cancelHandler} className="btn w-1/2 rounded-none">
+                                <Button onClick={cancelHandler} className="btn w-1/2 rounded-none">
                                     Cancel
-                                </button>
-                                <button onClick={saveHandler} className="btn w-1/2 rounded-none">
+                                </Button>
+                                <Button onClick={saveHandler} className="btn w-1/2 rounded-none">
                                     Save
-                                </button>
+                                </Button>
                             </aside>
                         </aside>
                         <aside className="w-1/2 overflow-y-auto">
-                            <Markdown
-                                className="prose p-4 break-words"
-                                remarkPlugins={[remarkGfm]}
-                            >
+                            <Markdown className="prose p-4 break-words" remarkPlugins={[remarkGfm]}>
                                 {contents.content}
                             </Markdown>
                         </aside>

@@ -5,6 +5,7 @@ import { SingleUserRepository, UserRepositories } from "@/hooks/use-fetch-repos"
 import { toast } from "sonner";
 import { Heart } from "lucide-react";
 import ls from "@/utils/ls";
+import { Button } from "../ui/button";
 const AddToFavorites = () => {
     const pathname = usePathname();
     const [currentRepo, setCurrentRepo] = useState<SingleUserRepository>(
@@ -40,9 +41,9 @@ const AddToFavorites = () => {
         }
     };
     return (
-        <button className="btn btn-ghost" onClick={addToFavorites}>
+        <Button className="btn btn-ghost" onClick={addToFavorites}>
             <Heart />
-        </button>
+        </Button>
     );
 };
 

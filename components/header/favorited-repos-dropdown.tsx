@@ -23,7 +23,6 @@ const SelectedReposDropdown = () => {
             };
 
             const handleStorageChanges = () => {
-                console.log("storage changed");
                 storeFavoritedRepos();
             };
 

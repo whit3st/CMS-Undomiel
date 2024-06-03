@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import React from "react";
 
 const Auth = () => {
@@ -10,9 +11,9 @@ const Auth = () => {
     };
     return (
         <main className="grid place-content-center h-full">
-            <button onClick={loginWithGithub} className="btn">
+            <Button onClick={loginWithGithub} className="btn">
                 GitHub Login
-            </button>
+            </Button>
         </main>
     );
 };
