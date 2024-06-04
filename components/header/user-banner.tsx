@@ -3,9 +3,9 @@
 import React, { useEffect } from "react";
 import { Octokit } from "@octokit/rest";
 import SelectedReposDropdown from "./favorited-repos-dropdown";
-import UploadImage from "./upload-image";
+import UploadImage from "./upload-image-modal";
 import { LogOut } from "lucide-react";
-import ImagesDropdown from "./images-dropdown";
+import ImagesDropdown from "./images-modal";
 import { Button } from "../ui/button";
 const UserBanner = () => {
     const [profilePicture, setProfilePicture] = React.useState("");
@@ -55,7 +55,7 @@ const UserBanner = () => {
                 <p>
                     Logged in as <b>{userName}</b>
                 </p>
-                <Button className="btn btn-ghost" onClick={logout}>
+                <Button variant="ghost" onClick={logout}>
                     <LogOut />
                 </Button>
             </aside>

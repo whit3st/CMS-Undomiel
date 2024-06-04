@@ -3,8 +3,18 @@ import type { UserRepositories } from "@/hooks/use-fetch-repos";
 import React, { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import ls from "@/utils/ls";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { ChevronDown } from "lucide-react";
+import { Button } from "../ui/button";
 
-const SelectedReposDropdown = () => {
+const FavoritedReposDropdown = () => {
     const pathname = usePathname();
     const CURRENT_REPO = pathname.split("/")[2];
     const [favoritedRepos, setFavoritedRepos] = useState<UserRepositories>([]);
@@ -33,42 +43,41 @@ const SelectedReposDropdown = () => {
         }
     }, []);
     return (
-        <div className="dropdown dropdown-hover dropdown-bottom dropdown-end">
-            <div tabIndex={0} role="button" className="btn btn-ghost">
-                Favorites
-                <svg
-                    className="h-6 w-6 fill-current -rotate-90"
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                >
-                    <path d="M15.41,16.58L10.83,12L15.41,7.41L14,6L8,12L14,18L15.41,16.58Z"></path>
-                </svg>
-            </div>
-            {favoritedRepos && favoritedRepos.length > 0 && (
-                <ul
-                    tabIndex={0}
-                    className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-72 border"
-                >
-                    {favoritedRepos.map((repo) => {
+        <DropdownMenu>
+            <Button variant={"outline"} asChild>
+                <DropdownMenuTrigger className="flex gap-2 items-center">
+                    <p>Favorites</p>
+                    <ChevronDown size={18} />
+                </DropdownMenuTrigger>
+            </Button>
+            <DropdownMenuContent align="end">
+                <DropdownMenuLabel>Favorited Repositories</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                {favoritedRepos &&
+                    favoritedRepos.map((repo) => {
                         return (
-                            <li key={repo.id} className="my-1">
-                                <Link
-                                    href={`/repo/${repo.name}`}
-                                    className={`btn btn-sm w-64 mx-auto truncate ${
-                                        CURRENT_REPO === repo.name ? "btn-neutral" : "btn-ghost"
-                                    }`}
+                            <DropdownMenuItem
+                                key={repo.id}
+                                className="w-64 my-1 cursor-pointer"
+                                // className={`w-64 cursor-pointer my-1 ${
+                                //     CURRENT_REPO === repo.name ? "bg-neutral" : "bg-secondary"
+                                // }`}
+                                asChild
+                            >
+                                <Button
+                                    asChild
+                                    variant={CURRENT_REPO === repo.name ? "default" : "outline"}
                                 >
-                                    <p className="truncate">{repo.name}</p>
-                                </Link>
-                            </li>
+                                    <Link href={`/repo/${repo.name}`}>
+                                        <p className="truncate">{repo.name}</p>
+                                    </Link>
+                                </Button>
+                            </DropdownMenuItem>
                         );
                     })}
-                </ul>
-            )}
-        </div>
+            </DropdownMenuContent>
+        </DropdownMenu>
     );
 };
 
-export default SelectedReposDropdown;
+export default FavoritedReposDropdown;

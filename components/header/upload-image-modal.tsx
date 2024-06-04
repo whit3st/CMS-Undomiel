@@ -1,12 +1,22 @@
 import { useEffect, useRef, useState } from "react";
-import { ImageUp, X } from "lucide-react";
+import { ImageUp, LoaderCircle, X } from "lucide-react";
 import { Octokit } from "@octokit/rest";
 import { Toaster, toast } from "sonner";
 import { SingleUserRepository } from "@/hooks/use-fetch-repos";
 import ls from "@/utils/ls";
 import { useCurrentRepo } from "@/store/store";
 import { Button } from "../ui/button";
-const UploadImage = () => {
+import { Input } from "../ui/input";
+
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+    DialogClose,
+} from "@/components/ui/dialog";
+const UploadImageModal = () => {
     const { currentRepo } = useCurrentRepo();
     const modalRef = useRef<HTMLDialogElement>(null);
     const inputRef = useRef<HTMLInputElement>(null);
@@ -30,7 +40,7 @@ const UploadImage = () => {
                 reader.onerror = reject;
             });
 
-            console.log(inputRef.current?.files?.[0]);
+        console.log(inputRef.current?.files?.[0]);
         if (!inputRef.current?.files?.[0]) {
             toast.error("No image selected");
             return;
@@ -58,9 +68,15 @@ const UploadImage = () => {
             if (data.message === "ok") {
                 toast.success("Image uploaded successfully");
             } else {
-                toast.error("Error uploading image", {
-                    description: data.message,
-                });
+                if (data.message.includes("sha")) {
+                    toast.error("Error uploading image", {
+                        description: "Image already exists",
+                    });
+                } else {
+                    toast.error("Error uploading image", {
+                        description: data.message,
+                    });
+                }
             }
             const updateImagesEvent = new Event("updateImages");
             window.dispatchEvent(updateImagesEvent);
@@ -73,50 +89,59 @@ const UploadImage = () => {
     };
     if (currentRepo) {
         return (
-            <>
-                <Button className="btn btn-ghost" onClick={openModal} title="Upload Image">
-                    <ImageUp />
+            <Dialog>
+                <Button asChild variant={"ghost"} title="Select Image Modal">
+                    <DialogTrigger>
+                        <ImageUp />
+                    </DialogTrigger>
                 </Button>
-                <dialog id="uploadImageModal" ref={modalRef} className="modal">
-                    <Toaster richColors />
-                    <section className="modal-box">
-                        <aside className="flex w-full justify-between">
-                            <h3 className="font-bold text-lg">Upload Image</h3>
-                            <CloseModalButton />
-                        </aside>
-                        <section className="my-8 flex flex-col gap-2">
-                            <p className="opacity-90 text-xs leading-normal">
-                                *All images will be uploaded to the{" "}
-                                <b>
-                                    <i>public/undomielcms/images</i>
-                                </b>{" "}
-                                path of the <b>{currentRepo.name}</b> repository.
-                            </p>
-                            <input
+                <DialogContent className="max-w-3xl max-h-[50vh]">
+                    <DialogHeader>
+                        <DialogTitle>Upload Image to {currentRepo?.name}</DialogTitle>
+                        <DialogClose className="mt-[0!important]">
+                            <X size={20} className="shrink-0" />
+                        </DialogClose>
+                    </DialogHeader>
+                    <section className="flex flex-col gap-4 grow mt-12">
+                        <aside className="flex items-center gap-2">
+                            <Input
                                 type="file"
-                                className="file-input file-input-primary file-input-bordered w-full mt-6 mb-4"
                                 accept="image/webp, image/png, image/jpeg"
                                 ref={inputRef}
                             />
-                            {loading && <progress className="progress progress-primary w-full" />}
-                            {!loading && (
-                                <Button className="btn btn-outline" onClick={uploadImageHandler}>
-                                    Upload
-                                </Button>
-                            )}
-                        </section>
-                        <p className="text-sm">
-                            <b>Caution:</b> Images effect loading speed. Use <b>compressed</b> and
-                            <b> optimized</b> images for best results.
-                        </p>
+                            <Button
+                                variant={"outline"}
+                                onClick={uploadImageHandler}
+                                className="min-w-32"
+                            >
+                                {loading ? (
+                                    <LoaderCircle className="w-6 h-6 animate-spin" />
+                                ) : (
+                                    "Upload"
+                                )}
+                            </Button>
+                        </aside>
+                        <aside className="flex flex-col text-xs text-pretty leading-normal">
+                            <p>
+                                All images will be uploaded to the{" "}
+                                <b>
+                                    <i>public/undomielcms/images</i>{" "}
+                                </b>{" "}
+                                path of the <b>{currentRepo.name}</b> repository.
+                            </p>
+                            <p>
+                                Images effect loading speed. Use <b>compressed</b> and{" "}
+                                <b> optimized</b> images for best results.
+                            </p>
+                        </aside>
                     </section>
-                </dialog>
-            </>
+                </DialogContent>
+            </Dialog>
         );
     }
 };
 
-export default UploadImage;
+export default UploadImageModal;
 
 const CloseModalButton = () => {
     return (

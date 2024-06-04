@@ -21,10 +21,12 @@ export default function RootLayout({
 }>) {
     return (
         <html lang="en" data-theme="lofi">
-            <body className={jost.className + " px-6 min-h-screen"}>
-                <Toaster richColors />
-                <Header />
-                {children}
+            <body className={jost.className}>
+                <div className="px-10 min-h-screen">
+                    <Toaster richColors />
+                    <Header />
+                    {children}
+                </div>
             </body>
         </html>
     );

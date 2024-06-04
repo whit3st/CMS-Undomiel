@@ -1,47 +1,40 @@
 import { SingleUserRepository } from "@/hooks/use-fetch-repos";
-import useGetCurrentRepo from "@/hooks/use-get-current-repo";
 import { Octokit } from "@octokit/rest";
-import { Images, RefreshCcw, X, XCircle } from "lucide-react";
-import React, { useEffect, useRef, useState } from "react";
+import { Images, LoaderCircle, RefreshCcw, X } from "lucide-react";
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
-import { Toaster, toast } from "sonner";
+import { toast } from "sonner";
 import ls from "@/utils/ls";
 import { useCurrentRepo } from "@/store/store";
 import { Button } from "@/components/ui/button";
 import {
     Dialog,
     DialogContent,
-    DialogDescription,
     DialogHeader,
     DialogTitle,
     DialogTrigger,
     DialogClose,
 } from "@/components/ui/dialog";
-const ImagesDropdown = () => {
+const ImagesModal = () => {
+    const [images, setImages] = useState<ImagesType[] | null>();
+    const [loading, setLoading] = useState<boolean>(true);
     const { currentRepo } = useCurrentRepo();
     const [accessToken, setAccessToken] = useState<string>("");
-    const modalRef = useRef<HTMLDialogElement>(null);
     type ImagesType = {
         src: string;
         name: string;
     };
-    const [images, setImages] = useState<ImagesType[] | null>();
-    const openModal = () => {
-        const modal = modalRef.current;
-        if (modal) {
-            modal.showModal();
-        }
-    };
 
     const copyHandler = (image: string) => {
         if (!currentRepo) return;
-        navigator.clipboard.writeText(currentRepo.homepage + "/undomielcms/images/" + image);
+        // example markdown image string: ![blog placeholder](/blog-placeholder-about.jpg)
+        const markdownImageString = `![${image}](${currentRepo.homepage}/undomielcms/images/${image})`;
+        navigator.clipboard.writeText(markdownImageString);
         toast.success("Copied!");
     };
 
     const getImages = async (accessToken: string, currentRepo: SingleUserRepository) => {
-        // wait for github to push images
-        // await new Promise((resolve) => setTimeout(resolve, 4000));
+        setLoading(true);
         const octokit = new Octokit({
             auth: accessToken,
         });
@@ -83,6 +76,11 @@ const ImagesDropdown = () => {
 
                 const imagesData = (await Promise.all(imagePromises)) as ImagesType[];
                 setImages(imagesData);
+                new Promise((resolve) => {
+                    setTimeout(() => {
+                        setLoading(false);
+                    }, 2000);
+                });
             }
         } catch (err) {
             console.error("Error fetching images:", err);
@@ -101,27 +99,36 @@ const ImagesDropdown = () => {
     if (currentRepo) {
         return (
             <Dialog>
-                <DialogTrigger>
-                    <Images />
-                </DialogTrigger>
-                <DialogContent>
+                <Button asChild variant={"ghost"} title="Select Image Modal">
+                    <DialogTrigger>
+                        <Images />
+                    </DialogTrigger>
+                </Button>
+                <DialogContent className="h-full">
                     <DialogHeader>
-                        <DialogTitle>Select Image from {currentRepo?.name}</DialogTitle>
-                        <Button
-                            variant={"outline"}
-                            className="btn btn-sm btn-ghost"
-                            onClick={() => getImages(accessToken, currentRepo)}
-                            title="Force Refresh"
-                        >
-                            <RefreshCcw />
-                        </Button>
-                        <DialogClose className="ml-auto">
+                        <aside className="flex items-center gap-2">
+                            <DialogTitle>Select Image from {currentRepo?.name}</DialogTitle>
+                            <Button
+                                variant={"ghost"}
+                                className="btn btn-sm btn-ghost"
+                                onClick={() => getImages(accessToken, currentRepo)}
+                                title="Force Refresh"
+                            >
+                                <RefreshCcw />
+                            </Button>
+                        </aside>
+                        <DialogClose className="mt-[0!important]">
                             <X />
                         </DialogClose>
                     </DialogHeader>
-                    <aside className="grid grid-cols-6 gap-1 h-[80vh] overflow-y-auto">
-                        {images ? (
-                            images.map((image) => (
+                    {loading && (
+                        <div className="flex gap-2 h-full w-full items-center justify-center">
+                            <LoaderCircle className="w-10 h-10 animate-spin" />
+                        </div>
+                    )}
+                    {images && !loading && (
+                        <aside className="grid grid-cols-6 gap-0 overflow-y-auto">
+                            {images.map((image) => (
                                 <Button
                                     variant={"outline"}
                                     className="w-60 h-60 overflow-clip"
@@ -136,15 +143,13 @@ const ImagesDropdown = () => {
                                         height={300}
                                     />
                                 </Button>
-                            ))
-                        ) : (
-                            <p className="text-start text-lg">No images found</p>
-                        )}
-                    </aside>
+                            ))}
+                        </aside>
+                    )}
                 </DialogContent>
             </Dialog>
         );
     }
 };
 
-export default ImagesDropdown;
+export default ImagesModal;

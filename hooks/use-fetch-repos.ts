@@ -22,7 +22,7 @@ const useFetchRepos = () => {
         const octokit = new Octokit({ auth: ACCESS_TOKEN });
         const fetchRepos = async () => {
             try {
-                setMessage("Fetching Astro repositories :)");
+                setMessage("Fetching Astro repositories");
                 const ALL_REPOS = await octokit.paginate("GET /user/repos");
                 const REPOS_WITH_ASTRO_CONFIG = [];
 
