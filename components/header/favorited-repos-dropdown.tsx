@@ -59,9 +59,6 @@ const FavoritedReposDropdown = () => {
                             <DropdownMenuItem
                                 key={repo.id}
                                 className="w-64 my-1 cursor-pointer"
-                                // className={`w-64 cursor-pointer my-1 ${
-                                //     CURRENT_REPO === repo.name ? "bg-neutral" : "bg-secondary"
-                                // }`}
                                 asChild
                             >
                                 <Button
@@ -75,6 +72,11 @@ const FavoritedReposDropdown = () => {
                             </DropdownMenuItem>
                         );
                     })}
+                {favoritedRepos.length === 0 && (
+                    <DropdownMenuItem className="w-64 my-1">
+                        <p>No favorites found</p>
+                    </DropdownMenuItem>
+                )}
             </DropdownMenuContent>
         </DropdownMenu>
     );

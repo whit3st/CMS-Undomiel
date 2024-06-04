@@ -43,6 +43,7 @@ const useFetchSingleMarkdownFileContents = () => {
         setContents,
         originalContents,
         sha,
+        
     };
 };
 export default useFetchSingleMarkdownFileContents;

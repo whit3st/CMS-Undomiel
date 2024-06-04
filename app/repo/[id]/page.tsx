@@ -7,6 +7,7 @@ import useFetchContentFolders from "@/hooks/use-fetch-content-folders";
 import { useCurrentRepo } from "@/store/store";
 import ls from "@/utils/ls";
 import { UserRepositories } from "@/hooks/use-fetch-repos";
+import { Button } from "@/components/ui/button";
 const Repo = ({ params }: { params: { id: string } }) => {
     const { currentRepo, setCurrentRepo } = useCurrentRepo();
     useEffect(() => {
@@ -21,26 +22,23 @@ const Repo = ({ params }: { params: { id: string } }) => {
     const { folders, loading, error } = useFetchContentFolders(params.id);
     return (
         <main>
-            <section className="flex items-center gap-2">
+            <section className="flex items-center gap-2 border-b py-6">
                 <GoBack />
                 <AddToFavorites />
-                <p className="card-title">Current Viewing: {currentRepo?.name}</p>
+                <h1 className="text-lg">{currentRepo?.name}</h1>
             </section>
             <section className="py-6">
-                <h2 className="text-2xl py-2">Content Collections:</h2>
                 {loading && <span className="loading loading-dots loading-lg"></span>}
                 {error && <pre>{JSON.stringify(error, null, 2)}</pre>}
                 {folders && folders.length === 0 && <p>No content collections found</p>}
                 {folders &&
                     folders.length > 0 &&
                     folders.map((folder) => (
-                        <Link
-                            href={`/repo/${params.id}/edit/${folder.name}`}
-                            key={folder.sha}
-                            className="btn mx-1"
-                        >
-                            {folder.name}
-                        </Link>
+                        <Button asChild variant={"outline"} size={"lg"} key={folder.sha}>
+                            <Link href={`/repo/${params.id}/edit/${folder.name}`}>
+                                {folder.name}
+                            </Link>
+                        </Button>
                     ))}
             </section>
         </main>

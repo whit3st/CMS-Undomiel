@@ -1,7 +1,7 @@
 "use client";
 import useFetchMarkdownFiles from "@/hooks/use-fetch-markdown-files";
 import useFetchSingleMarkdownFileContents from "@/hooks/use-fetch-markdown-file";
-import { ChevronLeft } from "lucide-react";
+import { ChevronLeft, FilePen, LoaderCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
 import MDEditor from "@uiw/react-md-editor";
 import matter, { GrayMatterFile } from "gray-matter";
@@ -12,6 +12,15 @@ import ls from "@/utils/ls";
 import { SingleUserRepository } from "@/hooks/use-fetch-repos";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
 
 const Repo = ({ params }: { params: { content: string } }) => {
     const router = useRouter();
@@ -70,28 +79,72 @@ const Repo = ({ params }: { params: { content: string } }) => {
 
     return (
         <main>
-            <Button className="btn mb-6 border hover:border-inherit" onClick={() => router.back()}>
-                <ChevronLeft />
-                Go back
-            </Button>
+            <section className="flex gap-2 items-center">
+                <Button
+                    className="flex gap-1 items-center my-6"
+                    variant={"outline"}
+                    onClick={() => router.back()}
+                    title="Go back to all content collections page"
+                >
+                    <ChevronLeft />
+                    Go back
+                </Button>
+                <Dialog>
+                    <Button asChild variant={"ghost"} title="Edit frontmatter data">
+                        <DialogTrigger>
+                            <FilePen />
+                        </DialogTrigger>
+                    </Button>
+                    <DialogContent>
+                        <DialogHeader>
+                            <DialogTitle>Frontmatter Data</DialogTitle>
+                        </DialogHeader>
+                        <section className="grid grid-cols-2 gap-2">
+                            {contents &&
+                                contents.data &&
+                                Object.entries(contents.data).map((data) => {
+                                    return (
+                                        <div key={Math.random()}>
+                                            <label htmlFor={data[0]}>
+                                                <p className="capitalize py-1.5">
+                                                    <b>{data[0]}</b>
+                                                </p>
+                                                <Input
+                                                    type="text"
+                                                    id={data[0]}
+                                                    defaultValue={data[1]}
+                                                    onBlur={(e) => {
+                                                        setContents({
+                                                            ...contents,
+                                                            data: {
+                                                                ...contents.data,
+                                                                [data[0]]: e.currentTarget.value,
+                                                            },
+                                                        });
+                                                    }}
+                                                />
+                                            </label>
+                                        </div>
+                                    );
+                                })}
+                        </section>
+                    </DialogContent>
+                </Dialog>
+            </section>
             <section className="flex border rounded-md overflow-clip h-[600px]">
                 {/* ALL MARKDOWN FILES */}
 
-                <aside className="relative flex flex-col w-1/6 overflow-auto border-r">
-                    {loading && (
-                        <span className="loading loading-dots loading-lg absolute top-1/2 left-1/2 translate-x-[-50%] translate-y-[-50%]"></span>
-                    )}
+                <aside className="relative flex flex-col w-1/6 p-1 gap-1 overflow-auto border-r">
+                    {loading && <LoaderCircle className="animate-spin w-10 h-10" />}
                     {error && <p>{error}</p>}
                     {markdownFiles &&
                         markdownFiles.map((file) => (
                             <Button
                                 key={file.sha}
+                                variant={
+                                    selectedMarkdownFilePath === file.path ? "default" : "outline"
+                                }
                                 onClick={() => setSelectedMarkdownFilePath(file.path)}
-                                className={`px-2 truncate text-start py-1.5 ${
-                                    selectedMarkdownFilePath === file.path
-                                        ? "bg-neutral text-primary-content"
-                                        : ""
-                                }`}
                                 title={file.name}
                             >
                                 {file.name.replace(".md", "")}
