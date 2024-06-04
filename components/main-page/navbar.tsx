@@ -1,6 +1,7 @@
 import { FolderSync } from "lucide-react";
 import React, { Dispatch, SetStateAction, useRef } from "react";
 import { Button } from "../ui/button";
+import { Input } from "../ui/input";
 
 const Navbar = ({
     state,
@@ -17,25 +18,25 @@ const Navbar = ({
         window?.location.reload();
     };
     return (
-        <aside className="flex gap-4 items-center justify-end">
-            <Button className="btn btn-ghost" onClick={forceRefresh} title="Force Refresh">
+        <aside className="flex gap-4 items-center justify-end mt-6">
+            <Button variant={"ghost"} onClick={forceRefresh} title="Force Refresh">
                 <FolderSync />
             </Button>
             <section className="flex gap-2 items-center">
-                <label className="input input-bordered flex items-center w-72">
-                    <input
+                <label className="relative w-72">
+                    <Input
                         ref={inputRef}
                         value={state.inputValue}
                         onChange={InputHandler}
                         type="text"
-                        className="grow"
+                        name="search"
                         placeholder="Search"
                     />
                     <svg
                         xmlns="http://www.w3.org/2000/svg"
                         viewBox="0 0 16 16"
                         fill="currentColor"
-                        className="w-6 h-6"
+                        className="w-6 h-6 absolute right-2 top-1/2 -translate-y-1/2"
                     >
                         <path
                             fillRule="evenodd"

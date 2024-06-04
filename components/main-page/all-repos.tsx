@@ -3,6 +3,7 @@ import useFetchRepos from "@/hooks/use-fetch-repos";
 import Link from "next/link";
 import { useState } from "react";
 import Navbar from "./navbar";
+import { Button } from "../ui/button";
 
 const AllRepos = () => {
     const { allRepos, message, loading, error } = useFetchRepos();
@@ -29,13 +30,11 @@ const AllRepos = () => {
                         .filter((repo) => repo.name.includes(inputValue))
                         .map((repo) => {
                             return (
-                                <Link
-                                    key={repo.id}
-                                    href={`/repo/${repo.name}`}
-                                    className="btn btn-lg btn-outline leading-tight"
-                                >
-                                    <p className="truncate">{repo.name}</p>
-                                </Link>
+                                <Button asChild key={repo.id} variant={"outline"}>
+                                    <Link href={`/repo/${repo.name}`}>
+                                        <p className="truncate">{repo.name}</p>
+                                    </Link>
+                                </Button>
                             );
                         })}
                 </section>

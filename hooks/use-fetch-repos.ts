@@ -34,12 +34,10 @@ const useFetchRepos = () => {
                             repo: name,
                             path: "astro.config.mjs",
                         });
-
                         REPOS_WITH_ASTRO_CONFIG.push(repo);
                     } catch (err) {
                         const error = err as Error;
                         console.log(error.name, error.message);
-                        toast.error(error.message);
                     } finally {
                         localStorage.setItem("ALL_REPOS", JSON.stringify(REPOS_WITH_ASTRO_CONFIG));
                         setAllRepos(REPOS_WITH_ASTRO_CONFIG);
