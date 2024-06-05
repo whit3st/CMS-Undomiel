@@ -11,7 +11,7 @@ export default function Home() {
             window.location.assign("/auth");
         }
         setCurrentRepo(null);
-    }, [setCurrentRepo]);
+    }, []);
 
     return (
         <main className="grid gap-5">

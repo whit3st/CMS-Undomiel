@@ -1,7 +1,6 @@
 import {
     Dialog,
     DialogContent,
-    DialogDescription,
     DialogHeader,
     DialogTitle,
     DialogTrigger,
@@ -10,24 +9,24 @@ import {
 import { Input } from "@/components/ui/input";
 import { ChevronLeft, FilePen, X } from "lucide-react";
 import { Button } from "../ui/button";
-import useFetchSingleMarkdownFileContents from "@/hooks/use-fetch-markdown-file";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import ls from "@/utils/ls";
 import { SingleUserRepository } from "@/hooks/use-fetch-repos";
-
-const ContentHeader = () => {
+import { GrayMatterFile } from "gray-matter";
+import { SetStateAction } from "react";
+type ContentHeaderParams = {
+    contents: GrayMatterFile<string> | undefined;
+    setContents: React.Dispatch<SetStateAction<GrayMatterFile<string> | undefined>>;
+    selectedMarkdownFilePath: string;
+    sha: string;
+    originalContents: GrayMatterFile<string> | undefined;
+};
+const ContentHeader = ({ data }: { data: ContentHeaderParams }) => {
     const router = useRouter();
-    const {
-        contents,
-        setContents,
-        originalContents,
-        selectedMarkdownFilePath,
-        sha,
-    } = useFetchSingleMarkdownFileContents();
-
+    const { contents, setContents, originalContents, selectedMarkdownFilePath, sha } = data;
     const saveHandler = async () => {
-        if (contents == originalContents) {
+        if (contents === originalContents) {
             toast.error("No changes to save");
             return;
         }
@@ -67,9 +66,9 @@ const ContentHeader = () => {
         toast.success("File created successfully");
     };
     return (
-        <section className="flex gap-2 items-center">
+        <section className="flex gap-2 items-center mt-6 mb-2">
             <Button
-                className="flex gap-1 items-center my-6"
+                className="flex gap-1 items-center"
                 variant={"outline"}
                 onClick={() => router.back()}
                 title="Go back to all content collections page"
@@ -107,7 +106,7 @@ const ContentHeader = () => {
                         </DialogTrigger>
                         <DialogContent className="w-1/3 max-h-[500px]">
                             <DialogHeader>
-                                <DialogTitle>Frontmatter Data</DialogTitle>
+                                <DialogTitle className="tracking-wider">Frontmatter Data</DialogTitle>
                                 <DialogClose onClick={() => toast.success("Saved")}>
                                     <X />
                                 </DialogClose>

@@ -7,18 +7,63 @@ import Markdown from "react-markdown";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import ContentHeader from "@/components/content/header";
-
+import { useParams } from "next/navigation";
+import { useCurrentRepo } from "@/store/store";
+import { SyntheticEvent, useEffect, useState } from "react";
+import ls from "@/utils/ls";
+import { UserRepositories } from "@/hooks/use-fetch-repos";
 const Repo = ({ params }: { params: { content: string } }) => {
+    /*
+     * since current repo is set at repo/[id],
+     * If user don't go through repo/[id] and go to repo/[id]/edit/[content] page directly,
+     * via favorites dropdown, we need to set the current repo in the store
+     * using params.id and calling setCurrentRepo from the store
+     */
+    const { setCurrentRepo } = useCurrentRepo();
+    const { id } = useParams();
+    useEffect(() => {
+        if (!window) return;
+        const ALL_REPOS = ls<UserRepositories>("ALL_REPOS");
+        if (!ALL_REPOS) return;
+        const CURRENT_REPO = ALL_REPOS.find((repo) => repo.name === id);
+        if (!CURRENT_REPO) return;
+        setCurrentRepo(CURRENT_REPO);
+    }, [id]);
+
     const { markdownFiles, loading, error } = useFetchMarkdownFiles(
         `src/content/${params.content}`
     );
+    const {
+        contents,
+        setContents,
+        setSelectedMarkdownFilePath,
+        originalContents,
+        selectedMarkdownFilePath,
+        sha,
+    } = useFetchSingleMarkdownFileContents();
 
-    const { contents, setContents, selectedMarkdownFilePath, setSelectedMarkdownFilePath } =
-        useFetchSingleMarkdownFileContents();
+    /*
+     * Just to make things clearer
+     */
+    const HeaderParams = {
+        contents,
+        setContents,
+        selectedMarkdownFilePath,
+        sha,
+        originalContents,
+    };
+
+    const [selectedText, setSelectedText] = useState("");
+    const handleSelect = (event) => {
+        const textarea = event.target;
+        const selection = textarea.value.substring(textarea.selectionStart, textarea.selectionEnd);
+        setSelectedText(selection);
+        console.log("Selected text:", selection);
+    };
 
     return (
-        <main>
-            <ContentHeader />
+        <main className="grid">
+            <ContentHeader data={HeaderParams} />
             <section className="flex border overflow-hidden h-[600px]">
                 {/* ALL MARKDOWN FILES */}
                 <aside className="flex flex-col w-1/6 p-1 gap-1 overflow-auto border-r">
@@ -30,13 +75,15 @@ const Repo = ({ params }: { params: { content: string } }) => {
                         markdownFiles.map((file) => (
                             <Button
                                 key={file.sha}
+                                className="capitalize"
+                                size={"xl"}
                                 variant={
                                     selectedMarkdownFilePath === file.path ? "default" : "outline"
                                 }
                                 onClick={() => setSelectedMarkdownFilePath(file.path)}
                                 title={file.name}
                             >
-                                {file.name.replace(".md", "")}
+                                {file.name.replace(".md", "").split("-").join(" ")}
                             </Button>
                         ))}
                 </aside>
@@ -50,6 +97,7 @@ const Repo = ({ params }: { params: { content: string } }) => {
                                 className="h-full resize-none rounded-none border-none text-base"
                                 value={contents.content}
                                 contentEditable
+                                onSelect={handleSelect}
                                 onInput={(e) => {
                                     setContents({ ...contents, content: e.currentTarget.value });
                                 }}
