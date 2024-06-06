@@ -43,6 +43,9 @@ const UserBanner = () => {
 
     const logout = () => {
         localStorage.removeItem("ACCESS_TOKEN");
+        localStorage.removeItem("CURRENT_REPO");
+        localStorage.removeItem("FAVORITED_REPOS");
+        localStorage.removeItem("ALL_REPOS");
         window?.location.assign("/");
     };
 
