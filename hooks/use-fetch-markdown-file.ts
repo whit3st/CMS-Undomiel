@@ -3,8 +3,10 @@ import type { SingleUserRepository } from "./use-fetch-repos";
 import matter, { GrayMatterFile } from "gray-matter";
 import ls from "@/utils/ls";
 const useFetchSingleMarkdownFileContents = () => {
-    const [contents, setContents] = useState<GrayMatterFile<string>>();
-    const [originalContents, setOriginalContents] = useState<GrayMatterFile<string>>();
+    const [contents, setContents] = useState<GrayMatterFile<string>>({} as GrayMatterFile<string>);
+    const [originalContents, setOriginalContents] = useState<GrayMatterFile<string>>(
+        {} as GrayMatterFile<string>
+    );
     const [selectedMarkdownFilePath, setSelectedMarkdownFilePath] = useState<string>("");
     const [sha, setSha] = useState<string>("");
     useEffect(() => {
@@ -43,7 +45,6 @@ const useFetchSingleMarkdownFileContents = () => {
         setContents,
         originalContents,
         sha,
-        
     };
 };
 export default useFetchSingleMarkdownFileContents;

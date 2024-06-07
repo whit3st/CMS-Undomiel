@@ -7,7 +7,7 @@ const MarkdownEditor = ({
 }: {
     data: {
         contents: GrayMatterFile<string>;
-        setContents: Dispatch<SetStateAction<GrayMatterFile<string> | undefined>>;
+        setContents: Dispatch<SetStateAction<GrayMatterFile<string>>>;
     };
 }) => {
     const [selectedText, setSelectedText] = useState(false);
@@ -28,9 +28,8 @@ const MarkdownEditor = ({
                 rows={15}
                 className="h-full resize-none rounded-none border-none text-base"
                 value={data.contents.content}
-                contentEditable
                 onSelect={handleSelect}
-                onInput={(e) => {
+                onChange={(e) => {
                     data.setContents({ ...data.contents, content: e.currentTarget.value });
                 }}
             ></Textarea>

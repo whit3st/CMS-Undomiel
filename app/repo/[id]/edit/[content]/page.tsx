@@ -51,7 +51,7 @@ const Repo = ({ params }: { params: { content: string } }) => {
             <ContentHeader data={HeaderParams} />
             <section className="flex border overflow-hidden h-[600px]">
                 <MarkdownFiles data={{ selectedMarkdownFilePath, setSelectedMarkdownFilePath }} />
-                {contents && (
+                {Object.entries(contents).length !== 0 && (
                     <section className="flex w-5/6">
                         <MarkdownEditor data={{ contents, setContents }} />
                         <Preview>{contents.content}</Preview>

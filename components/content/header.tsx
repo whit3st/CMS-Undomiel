@@ -1,11 +1,4 @@
-import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-    DialogClose,
-} from "@/components/ui/dialog";
+
 import { Input } from "@/components/ui/input";
 import { ChevronLeft, FilePen, X } from "lucide-react";
 import { Button } from "../ui/button";
@@ -15,12 +8,14 @@ import ls from "@/utils/ls";
 import { SingleUserRepository } from "@/hooks/use-fetch-repos";
 import { GrayMatterFile } from "gray-matter";
 import { SetStateAction } from "react";
-type ContentHeaderParams = {
-    contents: GrayMatterFile<string> | undefined;
-    setContents: React.Dispatch<SetStateAction<GrayMatterFile<string> | undefined>>;
+import ChangeTracker from "./change-tracker";
+import FrontmatterModal from "./frontmatter-modal";
+export type ContentHeaderParams = {
+    contents: GrayMatterFile<string>;
+    setContents: React.Dispatch<SetStateAction<GrayMatterFile<string>>>;
     selectedMarkdownFilePath: string;
     sha: string;
-    originalContents: GrayMatterFile<string> | undefined;
+    originalContents: GrayMatterFile<string>;
 };
 const ContentHeader = ({ data }: { data: ContentHeaderParams }) => {
     const router = useRouter();
@@ -54,7 +49,10 @@ const ContentHeader = ({ data }: { data: ContentHeaderParams }) => {
         }
     };
     const cancelHandler = () => {
-        if (contents == originalContents) {
+        if (
+            contents!.content == originalContents?.content &&
+            contents!.data == originalContents?.data
+        ) {
             toast.error("There is nothing to revert");
             return;
         }
@@ -64,6 +62,7 @@ const ContentHeader = ({ data }: { data: ContentHeaderParams }) => {
 
     const createNewFileHandler = () => {
         toast.success("File created successfully");
+        console.log(contents)
     };
     return (
         <section className="flex gap-2 items-center mt-6 mb-2">
@@ -79,78 +78,10 @@ const ContentHeader = ({ data }: { data: ContentHeaderParams }) => {
             <Button variant={"success"} onClick={createNewFileHandler}>
                 Create New
             </Button>
-            {contents && (
+            {Object.entries(contents).length !== 0 && (
                 <div className="flex gap-2 items-center ml-auto">
-                    <div>
-                        {contents == originalContents ? (
-                            <div className="flex gap-2 items-center mr-4">
-                                <div className="rounded-full bg-green-500 w-3 h-3"></div>
-                                <p>No Changes</p>
-                            </div>
-                        ) : (
-                            <div className="flex gap-2 items-center mr-4">
-                                <div className="rounded-full bg-amber-500 w-3 h-3"></div>
-                                <p>Unsaved Changes</p>
-                            </div>
-                        )}
-                    </div>
-                    <Dialog>
-                        <DialogTrigger asChild>
-                            <Button
-                                variant={"outline"}
-                                title="Edit frontmatter data"
-                                className={contents ? "block" : "hidden"}
-                            >
-                                <FilePen size={20} />
-                            </Button>
-                        </DialogTrigger>
-                        <DialogContent className="w-1/3 max-h-[500px]">
-                            <DialogHeader>
-                                <DialogTitle className="tracking-wider">Frontmatter Data</DialogTitle>
-                                <DialogClose onClick={() => toast.success("Saved")}>
-                                    <X />
-                                </DialogClose>
-                            </DialogHeader>
-                            <section className="grid gap-1 overflow-y-auto p-1">
-                                {contents &&
-                                    contents.data &&
-                                    Object.entries(contents.data).map((data) => {
-                                        return (
-                                            <div key={Math.random()}>
-                                                <label htmlFor={data[0]}>
-                                                    <p className="capitalize py-1.5">
-                                                        <b>{data[0]}</b>
-                                                    </p>
-                                                    <Input
-                                                        type="text"
-                                                        id={data[0]}
-                                                        defaultValue={data[1]}
-                                                        onBlur={(e) => {
-                                                            setContents({
-                                                                ...contents,
-                                                                data: {
-                                                                    ...contents.data,
-                                                                    [data[0]]:
-                                                                        e.currentTarget.value,
-                                                                },
-                                                            });
-                                                        }}
-                                                    />
-                                                </label>
-                                            </div>
-                                        );
-                                    })}
-                                <Button asChild className="mt-6">
-                                    <DialogClose
-                                        title="Save"
-                                        onClick={() => toast.success("Saved")}
-                                    >
-                                        Save
-                                    </DialogClose>
-                                </Button>
-                            </section>
-                        </DialogContent>
-                    </Dialog>
+                    <ChangeTracker data={data} />
+                    <FrontmatterModal props={data} />
                     <Button onClick={cancelHandler} variant={"destructive"}>
                         Cancel
                     </Button>
