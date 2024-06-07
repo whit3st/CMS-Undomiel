@@ -1,4 +1,3 @@
-
 import { Input } from "@/components/ui/input";
 import { ChevronLeft, FilePen, X } from "lucide-react";
 import { Button } from "../ui/button";
@@ -10,6 +9,7 @@ import { GrayMatterFile } from "gray-matter";
 import { SetStateAction } from "react";
 import ChangeTracker from "./change-tracker";
 import FrontmatterModal from "./frontmatter-modal";
+import CreateNewMarkdownModal from "./create-new-markdown-modal";
 export type ContentHeaderParams = {
     contents: GrayMatterFile<string>;
     setContents: React.Dispatch<SetStateAction<GrayMatterFile<string>>>;
@@ -60,10 +60,7 @@ const ContentHeader = ({ data }: { data: ContentHeaderParams }) => {
         toast.success("Changes cancelled");
     };
 
-    const createNewFileHandler = () => {
-        toast.success("File created successfully");
-        console.log(contents)
-    };
+    
     return (
         <section className="flex gap-2 items-center mt-6 mb-2">
             <Button
@@ -75,9 +72,7 @@ const ContentHeader = ({ data }: { data: ContentHeaderParams }) => {
                 <ChevronLeft />
                 Go back
             </Button>
-            <Button variant={"success"} onClick={createNewFileHandler}>
-                Create New
-            </Button>
+            <CreateNewMarkdownModal contents={contents} />
             {Object.entries(contents).length !== 0 && (
                 <div className="flex gap-2 items-center ml-auto">
                     <ChangeTracker data={data} />
