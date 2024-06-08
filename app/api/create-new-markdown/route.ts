@@ -1,9 +1,16 @@
+import { SingleUserRepository } from "@/hooks/use-fetch-repos";
+import { Octokit } from "@octokit/rest";
 import { stringify } from "gray-matter";
 
 export async function POST(request: Request) {
-    const { _frontmatter } = (await request.json()) as {
-        _frontmatter: Record<string, any>;
-    };
+    const { _frontmatter, _filename, _current_repo, _access_token, _content } =
+        (await request.json()) as {
+            _frontmatter: Record<string, any>;
+            _filename: string;
+            _current_repo: SingleUserRepository;
+            _access_token: string;
+            _content: string;
+        };
     /*
      * Clear the incoming frontmatter values,
      * Turn it to base64,
@@ -15,20 +22,24 @@ export async function POST(request: Request) {
     const UTF8data = stringify("", _frontmatter);
     const base64data = Buffer.from(UTF8data, "utf-8").toString("base64");
 
-    return Response.json({ message: "ok", _base64data: base64data });
-    // return Response.json({ frontmatter: _frontmatter, base64data: base64data });
+    const octokit = new Octokit({
+        auth: _access_token,
+    });
 
+    try {
+        const response = await octokit.repos.createOrUpdateFileContents({
+            owner: _current_repo.owner.login,
+            repo: _current_repo.name,
+            path: _current_repo.contents_url + "/src/content/" + _content + "/" + _filename + ".md",
+            message: `Undomiel CMS | Created ${_filename}.md at ${_current_repo.name}`,
+            content: base64data,
+        });
 
-    
-    //     octokit.rest.repos.createOrUpdateFileContents({
-    //         owner,
-    // repo,
-    // path,
-    // message,
-    // content,
-    // committer.name,
-    // committer.email,
-    // author.name,
-    // author.email
-    //       })
+        return Response.json({ message: "ok", response: response.data });
+    } catch (err) {
+        const error = err as Error;
+        return Response.json({
+            message: error.message,
+        });
+    }
 }
