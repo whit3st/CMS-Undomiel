@@ -17,4 +17,18 @@ export async function POST(request: Request) {
 
     return Response.json({ message: "ok", _base64data: base64data });
     // return Response.json({ frontmatter: _frontmatter, base64data: base64data });
+
+
+    
+    //     octokit.rest.repos.createOrUpdateFileContents({
+    //         owner,
+    // repo,
+    // path,
+    // message,
+    // content,
+    // committer.name,
+    // committer.email,
+    // author.name,
+    // author.email
+    //       })
 }
