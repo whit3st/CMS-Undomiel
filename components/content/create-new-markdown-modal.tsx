@@ -17,6 +17,7 @@ import { Input } from "../ui/input";
 import ls from "@/utils/ls";
 import { useParams } from "next/navigation";
 const CreateNewMarkdownModal = ({ contents }: { contents: GrayMatterFile<string> }) => {
+    const [modalOpen, setModalOpen] = useState(false);
     type EmptyFrontmatter = {
         [key in string]: string;
     };
@@ -47,27 +48,45 @@ const CreateNewMarkdownModal = ({ contents }: { contents: GrayMatterFile<string>
             return;
         }
         const access_token = ls<string>("ACCESS_TOKEN");
-        const response = await fetch("/api/create-new-markdown", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                _frontmatter: emptyFrontmatter,
-                _filename: fileName,
-                _current_repo: currentRepo,
-                _access_token: access_token,
-                _content: content,
-            }),
-        });
 
-        const data = await response.json();
+        try {
+            await fetch("/api/create-new-markdown", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    _frontmatter: emptyFrontmatter,
+                    _filename: fileName,
+                    _current_repo: currentRepo,
+                    _access_token: access_token,
+                    _content: content,
+                }),
+            });
 
-        console.log(data);
-        toast.success("File created successfully");
+            toast.success("File created successfully");
+            new Promise((resolve) => {
+                setTimeout(() => {
+                    resolve(true);
+                    window.location.reload();
+                }, 1000);
+            });
+        } catch (err) {
+            const error = err as Error;
+            console.log(error.name, error.message);
+            toast.error(error.message);
+        }
     };
 
     const getEmptyFrontmatter = async () => {
+        if (!Object.entries(contents).length) {
+            toast.error("Please select a post first from underneath", {
+                description: "If you want to create a new post, please select one from underneath for reference.",
+            });
+            return;
+        }
+
+        setModalOpen(true);
         const response = await fetch("/api/get-empty-frontmatter-object", {
             method: "POST",
             headers: {
@@ -83,20 +102,9 @@ const CreateNewMarkdownModal = ({ contents }: { contents: GrayMatterFile<string>
     };
 
     return (
-        <Dialog>
-            <Button asChild variant={"success"}>
-                <DialogTrigger
-                    onClick={getEmptyFrontmatter}
-                    disabled={Object.entries(contents).length === 0}
-                    title={
-                        Object.entries(contents).length === 0
-                            ? "Select a post first from underneath"
-                            : "Create new markdown"
-                    }
-                    className="disabled:pointer-events-auto"
-                >
-                    Create New
-                </DialogTrigger>
+        <Dialog open={modalOpen} onOpenChange={setModalOpen}>
+            <Button variant={"success"} onClick={getEmptyFrontmatter}>
+                Create New
             </Button>
             <DialogContent className="w-1/3 max-h-[500px] overflow-y-auto">
                 <DialogHeader>

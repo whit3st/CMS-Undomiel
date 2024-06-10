@@ -69,11 +69,11 @@ const FrontmatterModal = ({ props }: { props: ContentHeaderParams }) => {
                         </DialogClose>
                     </Button>
                 </section>
-                <section className="grid gap-2 border-t py-2">
+                {/* <section className="grid gap-2 border-t py-2">
                     <h2 className="text-lg font-semibold">Helpers</h2>
                     <DateHelper />
                     <ImageHelper />
-                </section>
+                </section> */}
             </DialogContent>
         </Dialog>
     );

@@ -1,6 +1,6 @@
 import { SingleUserRepository } from "@/hooks/use-fetch-repos";
 import { Octokit } from "@octokit/rest";
-import { Images, LoaderCircle, RefreshCcw, X } from "lucide-react";
+import { Clipboard, Images, LoaderCircle, RefreshCcw, X } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import { toast } from "sonner";
@@ -23,6 +23,7 @@ const ImagesModal = () => {
     type ImagesType = {
         src: string;
         name: string;
+        path: string;
     };
 
     const copyHandler = (image: string) => {
@@ -70,6 +71,7 @@ const ImagesModal = () => {
                         return {
                             src: withMetadata,
                             name: data.name,
+                            path: data.path,
                         };
                     }
                 });
@@ -127,12 +129,12 @@ const ImagesModal = () => {
                         </div>
                     )}
                     {images && !loading && (
-                        <aside className="grid grid-cols-6 gap-0 overflow-y-auto">
+                        <aside className="grid grid-cols-4 gap-2 overflow-y-auto">
                             {images.map((image) => (
                                 <Button
-                                    variant={"outline"}
-                                    className="w-60 h-60 overflow-clip"
                                     key={image.name}
+                                    variant={"outline"}
+                                    className="relative group w-52 h-52 overflow-clip"
                                     onClick={() => copyHandler(image.name)}
                                 >
                                     <Image
@@ -142,6 +144,16 @@ const ImagesModal = () => {
                                         width={300}
                                         height={300}
                                     />
+                                    <div className="absolute bottom-0 inset-x-0 h-min bg-white text-primary hidden group-hover:flex flex-col ">
+                                        <Button size={"sm"}>
+                                            <p className="mr-1">Copy for markdown</p>
+                                            <Clipboard size={16} />
+                                        </Button>
+                                        <Button size={"sm"} onClick={() => console.log(image.path)}>
+                                            <p className="mr-1">Copy repo path</p>
+                                            <Clipboard size={16} />
+                                        </Button>
+                                    </div>
                                 </Button>
                             ))}
                         </aside>

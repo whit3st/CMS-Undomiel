@@ -82,10 +82,13 @@ const ContentHeader = ({ data }: { data: ContentHeaderParams }) => {
                 <div className="flex gap-2 items-center ml-auto">
                     <ChangeTracker data={data} />
                     <FrontmatterModal props={data} />
-                    <Button onClick={cancelHandler} variant={"destructive"}>
+                    <Button onClick={() => toast.success("Deleted")} variant={"destructive"}>
+                        Delete
+                    </Button>
+                    <Button onClick={cancelHandler} variant={"default"}>
                         Cancel
                     </Button>
-                    <Button onClick={saveHandler} variant={"default"}>
+                    <Button onClick={saveHandler} variant={"success"}>
                         Save
                     </Button>
                 </div>
