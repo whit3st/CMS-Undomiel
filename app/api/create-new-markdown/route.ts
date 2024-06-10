@@ -25,17 +25,16 @@ export async function POST(request: Request) {
     const octokit = new Octokit({
         auth: _access_token,
     });
-
     try {
         const response = await octokit.repos.createOrUpdateFileContents({
             owner: _current_repo.owner.login,
             repo: _current_repo.name,
-            path: _current_repo.contents_url + "/src/content/" + _content + "/" + _filename + ".md",
+            path: "src/content/" + _content + "/" + _filename + ".md",
             message: `Undomiel CMS | Created ${_filename}.md at ${_current_repo.name}`,
             content: base64data,
         });
 
-        return Response.json({ message: "ok", response: response.data });
+        return Response.json({ message: "file created", response: response.data });
     } catch (err) {
         const error = err as Error;
         return Response.json({

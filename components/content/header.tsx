@@ -42,6 +42,12 @@ const ContentHeader = ({ data }: { data: ContentHeaderParams }) => {
                     }),
                 });
                 toast.success("File updated successfully");
+                new Promise((resolve) => {
+                    setTimeout(() => {
+                        resolve(true);
+                        window.location.reload();
+                    }, 1000);
+                });
             } catch (error) {
                 console.log(error);
                 toast.error("Something went wrong");
@@ -60,7 +66,6 @@ const ContentHeader = ({ data }: { data: ContentHeaderParams }) => {
         toast.success("Changes cancelled");
     };
 
-    
     return (
         <section className="flex gap-2 items-center mt-6 mb-2">
             <Button

@@ -19,7 +19,7 @@ const Repo = ({ params }: { params: { id: string } }) => {
         setCurrentRepo(CURRENT_REPO);
     }, [params.id, setCurrentRepo]);
 
-    const { folders, loading, error } = useFetchContentFolders(params.id);
+    const { folders,  loading, error } = useFetchContentFolders(params.id);
     return (
         <main>
             <section className="flex items-center gap-2 border-b py-6">

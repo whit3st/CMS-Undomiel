@@ -12,10 +12,11 @@ import { FilePen, X } from "lucide-react";
 import { Input } from "../ui/input";
 import { toast } from "sonner";
 import { ContentHeaderParams } from "./header";
-const FrontmatterModal = ({ props }: { props: ContentHeaderParams }) => {
+import DateHelper from "./date-helper";
+import ImageHelper from "./image-helper";
 
+const FrontmatterModal = ({ props }: { props: ContentHeaderParams }) => {
     const blurHandler = (e: React.FocusEvent<HTMLInputElement>, data: string[]) => {
-        return;
         props.setContents({
             ...props.contents,
             data: {
@@ -24,6 +25,7 @@ const FrontmatterModal = ({ props }: { props: ContentHeaderParams }) => {
             },
         });
     };
+
     return (
         <Dialog>
             <DialogTrigger asChild>
@@ -47,20 +49,18 @@ const FrontmatterModal = ({ props }: { props: ContentHeaderParams }) => {
                         props.contents.data &&
                         Object.entries(props.contents.data).map((data) => {
                             return (
-                                <div key={Math.random()}>
-                                    <label htmlFor={data[0]}>
-                                        <p className="capitalize py-1.5">
-                                            <b>{data[0]}</b>
-                                        </p>
-                                        <Input
-                                            type="text"
-                                            id={data[0]}
-                                            defaultValue={data[1]}
-                                            contentEditable
-                                            onBlur={(e) => blurHandler(e, data)}
-                                        />
-                                    </label>
-                                </div>
+                                <label htmlFor={data[0]} key={data[0] + data[1]} className="flex ">
+                                    <p className="capitalize py-1.5 truncate w-40">
+                                        <b>{data[0]}</b>
+                                    </p>
+                                    <Input
+                                        type="text"
+                                        id={data[0]}
+                                        defaultValue={data[1]}
+                                        contentEditable
+                                        onBlur={(e) => blurHandler(e, data)}
+                                    />
+                                </label>
                             );
                         })}
                     <Button asChild className="mt-6">
@@ -68,6 +68,11 @@ const FrontmatterModal = ({ props }: { props: ContentHeaderParams }) => {
                             Save
                         </DialogClose>
                     </Button>
+                </section>
+                <section className="grid gap-2 border-t py-2">
+                    <h2 className="text-lg font-semibold">Helpers</h2>
+                    <DateHelper />
+                    <ImageHelper />
                 </section>
             </DialogContent>
         </Dialog>

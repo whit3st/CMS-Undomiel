@@ -36,7 +36,6 @@ const useFetchContentFolders = (repoName: string): ReturnedType => {
                 });
                 if (Array.isArray(response.data)) {
                     const Allfolders = response.data.filter((item) => item.type === "dir");
-
                     setFolders(Allfolders);
                 } else {
                     throw new Error("The path is not a directory or is empty");

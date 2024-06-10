@@ -10,13 +10,18 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "../ui/button";
 import { toast } from "sonner";
+import { useCurrentRepo } from "@/store/store";
 import { GrayMatterFile } from "gray-matter";
 import { LoaderCircle, X } from "lucide-react";
 import { Input } from "../ui/input";
+import ls from "@/utils/ls";
+import { useParams } from "next/navigation";
 const CreateNewMarkdownModal = ({ contents }: { contents: GrayMatterFile<string> }) => {
     type EmptyFrontmatter = {
         [key in string]: string;
     };
+    const { content } = useParams();
+    const { currentRepo } = useCurrentRepo();
     const [emptyFrontmatter, setEmptyFrontmatter] = useState<EmptyFrontmatter>();
     const [fileName, setFileName] = useState<string>();
     const createNewFileHandler = async () => {
@@ -41,7 +46,7 @@ const CreateNewMarkdownModal = ({ contents }: { contents: GrayMatterFile<string>
             toast.error("Please enter a file name");
             return;
         }
-
+        const access_token = ls<string>("ACCESS_TOKEN");
         const response = await fetch("/api/create-new-markdown", {
             method: "POST",
             headers: {
@@ -50,12 +55,15 @@ const CreateNewMarkdownModal = ({ contents }: { contents: GrayMatterFile<string>
             body: JSON.stringify({
                 _frontmatter: emptyFrontmatter,
                 _filename: fileName,
+                _current_repo: currentRepo,
+                _access_token: access_token,
+                _content: content,
             }),
         });
 
         const data = await response.json();
 
-        console.log(fileName?.length);
+        console.log(data);
         toast.success("File created successfully");
     };
 
@@ -126,7 +134,7 @@ const CreateNewMarkdownModal = ({ contents }: { contents: GrayMatterFile<string>
                                 onChange={(e) =>
                                     setEmptyFrontmatter({
                                         ...emptyFrontmatter,
-                                        [key]: e.target.value,
+                                        [key]: e.currentTarget.value,
                                     })
                                 }
                             />
