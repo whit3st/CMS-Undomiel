@@ -32,10 +32,19 @@ const useFetchMarkdownFiles = (path: string) => {
                 });
 
                 if (Array.isArray(response.data)) {
-                    const markdownFiles = response.data.filter(
-                        (item) => item.type === "file" && item.name.endsWith(".md")
-                    );
-                    setMarkdownFiles(markdownFiles);
+                    // const markdownFiles = response.data.filter(
+                    //     (item) => item.type === "file" && item.name.endsWith(".md")
+                    // );
+
+                    const markdownFilesData = response.data.map((file) => {
+                        if (file.type === "file" && file.name.endsWith(".md")) {
+                            return file;
+                        }
+                    });
+
+                    if (markdownFilesData) {
+                        setMarkdownFiles(markdownFilesData);
+                    }
                 }
             } catch (err) {
                 const error = err as Error;

@@ -13,7 +13,7 @@ export async function POST(request: Request) {
         const octokit = new Octokit({
             auth: ACCESS_TOKEN,
         });
-    
+
         if (!CURRENT_REPO.owner || !CURRENT_REPO.name) {
             console.log("Invalid repository details");
             return Response.json({ message: "error", error: "Invalid repository details" });
@@ -21,17 +21,38 @@ export async function POST(request: Request) {
         const response = await octokit.repos.getContent({
             owner: "whit3st",
             repo: "custom-cms-for-content-collections",
-            path: "src/content/blogs/"
+            path: "src/content/blogs/",
         });
 
-        if (Array.isArray(response.data)) {
-            const markdownFiles = response.data.filter(
-                (item) => item.type === "file" && item.name.endsWith(".md")
-            );
-            markdownFileNames = markdownFiles.map((file) => file.name);
-        }
-
         // Filter only Markdown files
+        if (Array.isArray(response.data)) {
+            // const markdownFiles = response.data.filter(
+            //     (item) => item.type === "file" && item.name.endsWith(".md")
+            // );
+
+            const markdownFiles = response.data.map((file) => {
+                // fetch only markdown files
+                if (file.type === "file" && file.name.endsWith(".md")) {
+                    return file;
+                }
+                // check folders then fetch its content
+                if (file.type === "dir") {
+                    const folderResponse = octokit.repos.getContent({
+                        owner: "whit3st",
+                        repo: "custom-cms-for-content-collections",
+                        path: `src/content/blogs/${file.name}`,
+                    });
+
+                    // if (Array.isArray(folderResponse.data)) {
+                    //     return folderResponse.data.filter(
+                    //         (item) => item.type === "file" && item.name.endsWith(".md")
+                    //     );
+                    // }
+                }
+            });
+
+            // markdownFileNames = markdownFiles.map((file) => file.name);
+        }
 
         return Response.json({
             message: "ok",
@@ -39,7 +60,7 @@ export async function POST(request: Request) {
         });
     } catch (err) {
         console.error("Error:", err);
-        const error = err as Error
+        const error = err as Error;
         return Response.json({
             message: error.message + error.name,
             error: "An error occurred while fetching content",
